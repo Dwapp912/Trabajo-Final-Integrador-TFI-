@@ -4,7 +4,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import Config.DatabaseConnection;
-import Models.Domicilio;
+import Models.Envio;
 
 /**
  * Data Access Object para la entidad Domicilio.
@@ -24,7 +24,7 @@ import Models.Domicilio;
  *
  * Patrón: DAO con try-with-resources para manejo automático de recursos JDBC
  */
-public class DomicilioDAO implements GenericDAO<Domicilio> {
+public class DomicilioDAO implements GenericDAO<Envio> {
     /**
      * Query de inserción de domicilio.
      * Inserta calle y número.
@@ -84,18 +84,18 @@ public class DomicilioDAO implements GenericDAO<Domicilio> {
      * Esto permite que PersonaServiceImpl.insertar() use domicilio.getId()
      * inmediatamente después de insertar.
      *
-     * @param domicilio Domicilio a insertar (id será ignorado y regenerado)
+     * @param envio Domicilio a insertar (id será ignorado y regenerado)
      * @throws SQLException Si falla la inserción o no se obtiene ID generado
      */
     @Override
-    public void insertar(Domicilio domicilio) throws SQLException {
+    public void insertar(Envio envio) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
 
-            setDomicilioParameters(stmt, domicilio);
+            setDomicilioParameters(stmt, envio);
             stmt.executeUpdate();
 
-            setGeneratedId(stmt, domicilio);
+            setGeneratedId(stmt, envio);
         }
     }
 
@@ -108,16 +108,16 @@ public class DomicilioDAO implements GenericDAO<Domicilio> {
      * - Operaciones que requieren múltiples inserts coordinados
      * - Rollback automático si alguna operación falla
      *
-     * @param domicilio Domicilio a insertar
+     * @param envio Domicilio a insertar
      * @param conn Conexión transaccional (NO se cierra en este método)
      * @throws Exception Si falla la inserción
      */
     @Override
-    public void insertTx(Domicilio domicilio, Connection conn) throws Exception {
+    public void insertTx(Envio envio, Connection conn) throws Exception {
         try (PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            setDomicilioParameters(stmt, domicilio);
+            setDomicilioParameters(stmt, envio);
             stmt.executeUpdate();
-            setGeneratedId(stmt, domicilio);
+            setGeneratedId(stmt, envio);
         }
     }
 
@@ -137,21 +137,21 @@ public class DomicilioDAO implements GenericDAO<Domicilio> {
      * Esto es CORRECTO: permite que familias compartan la misma dirección
      * y se actualice en un solo lugar.
      *
-     * @param domicilio Domicilio con los datos actualizados (id debe ser > 0)
+     * @param envio Domicilio con los datos actualizados (id debe ser > 0)
      * @throws SQLException Si el domicilio no existe o hay error de BD
      */
     @Override
-    public void actualizar(Domicilio domicilio) throws SQLException {
+    public void actualizar(Envio envio) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(UPDATE_SQL)) {
 
-            stmt.setString(1, domicilio.getCalle());
-            stmt.setString(2, domicilio.getNumero());
-            stmt.setInt(3, domicilio.getId());
+            stmt.setString(1, envio.getEmpresa().toString());
+            stmt.setString(2, envio.getTracking());
+            stmt.setInt(3, envio.getId());
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
-                throw new SQLException("No se pudo actualizar el domicilio con ID: " + domicilio.getId());
+                throw new SQLException("No se pudo actualizar el domicilio con ID: " + envio.getId());
             }
         }
     }
@@ -206,7 +206,7 @@ public class DomicilioDAO implements GenericDAO<Domicilio> {
      * @throws SQLException Si hay error de BD
      */
     @Override
-    public Domicilio getById(int id) throws SQLException {
+    public Envio getById(int id) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(SELECT_BY_ID_SQL)) {
 
@@ -214,7 +214,7 @@ public class DomicilioDAO implements GenericDAO<Domicilio> {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return mapResultSetToDomicilio(rs);
+                    return mapResultSetToEnvio(rs);
                 }
             }
         }
@@ -233,19 +233,19 @@ public class DomicilioDAO implements GenericDAO<Domicilio> {
      * @throws SQLException Si hay error de BD
      */
     @Override
-    public List<Domicilio> getAll() throws SQLException {
-        List<Domicilio> domicilios = new ArrayList<>();
+    public List<Envio> getAll() throws SQLException {
+        List<Envio> envios = new ArrayList<>();
 
         try (Connection conn = DatabaseConnection.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(SELECT_ALL_SQL)) {
 
             while (rs.next()) {
-                domicilios.add(mapResultSetToDomicilio(rs));
+                envios.add(mapResultSetToEnvio(rs));
             }
         }
 
-        return domicilios;
+        return envios;
     }
 
     /**
@@ -257,12 +257,12 @@ public class DomicilioDAO implements GenericDAO<Domicilio> {
      * 2. numero (String)
      *
      * @param stmt PreparedStatement con INSERT_SQL
-     * @param domicilio Domicilio con los datos a insertar
+     * @param envio Domicilio con los datos a insertar
      * @throws SQLException Si hay error al setear parámetros
      */
-    private void setDomicilioParameters(PreparedStatement stmt, Domicilio domicilio) throws SQLException {
-        stmt.setString(1, domicilio.getCalle());
-        stmt.setString(2, domicilio.getNumero());
+    private void setDomicilioParameters(PreparedStatement stmt, Envio envio) throws SQLException {
+        stmt.setString(1, envio.getEmpresa().toString());
+        stmt.setString(2, envio.getTracking());
     }
 
     /**
@@ -277,13 +277,13 @@ public class DomicilioDAO implements GenericDAO<Domicilio> {
      * - Necesario para operaciones transaccionales que requieren el ID generado
      *
      * @param stmt PreparedStatement que ejecutó el INSERT con RETURN_GENERATED_KEYS
-     * @param domicilio Objeto domicilio a actualizar con el ID generado
+     * @param envio Objeto domicilio a actualizar con el ID generado
      * @throws SQLException Si no se pudo obtener el ID generado (indica problema grave)
      */
-    private void setGeneratedId(PreparedStatement stmt, Domicilio domicilio) throws SQLException {
+    private void setGeneratedId(PreparedStatement stmt, Envio envio) throws SQLException {
         try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
             if (generatedKeys.next()) {
-                domicilio.setId(generatedKeys.getInt(1));
+                envio.setId(generatedKeys.getInt(1));
             } else {
                 throw new SQLException("La inserción del domicilio falló, no se obtuvo ID generado");
             }
@@ -291,26 +291,24 @@ public class DomicilioDAO implements GenericDAO<Domicilio> {
     }
 
     /**
-     * Mapea un ResultSet a un objeto Domicilio.
+     * Mapea un ResultSet a un objeto Envio.
      * Reconstruye el objeto usando el constructor completo.
      *
-     * Mapeo de columnas:
-     * - id → id
-     * - calle → calle
-     * - numero → numero
-     *
-     * Nota: El campo eliminado NO se mapea porque las queries filtran por eliminado=FALSE,
-     * garantizando que solo se retornan domicilios activos.
-     *
-     * @param rs ResultSet posicionado en una fila con datos de domicilio
-     * @return Domicilio reconstruido
+     * @param rs ResultSet posicionado en una fila con datos de envio
+     * @return Envio reconstruido
      * @throws SQLException Si hay error al leer columnas del ResultSet
      */
-    private Domicilio mapResultSetToDomicilio(ResultSet rs) throws SQLException {
-        return new Domicilio(
+    private Envio mapResultSetToEnvio(ResultSet rs) throws SQLException {
+        return new Envio(
             rs.getInt("id"),
-            rs.getString("calle"),
-            rs.getString("numero")
+            rs.getBoolean("eliminado"),
+            rs.getString("tracking"),
+            Envio.Empresa.valueOf(rs.getString("empresa")),
+            Envio.Tipo.valueOf(rs.getString("tipo")),
+            rs.getDouble("costo"),
+            rs.getDate("fecha_despacho"),
+            rs.getDate("fecha_estimada"),
+            Envio.Estado.valueOf(rs.getString("estado"))
         );
     }
 }

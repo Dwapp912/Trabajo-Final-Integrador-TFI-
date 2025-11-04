@@ -21,8 +21,9 @@ import java.sql.SQLException;
  * - java -Ddb.url=... -Ddb.user=... -Ddb.password=...
  */
 public final class DatabaseConnection {
+    private static final String  PATH_PROPERTIES = "db.properties";
     /** URL de conexión JDBC. Configurable via -Ddb.url */
-    private static final String URL = System.getProperty("db.url", "jdbc:mysql://localhost:3306/tpi_pedido_envio");
+    private static final String URL = System.getProperty("db.url", "jdbc:mysql://localhost:3306/pedidosenvios");
 
     /** Usuario de la base de datos. Configurable via -Ddb.user */
     private static final String USER = System.getProperty("db.user", "root");

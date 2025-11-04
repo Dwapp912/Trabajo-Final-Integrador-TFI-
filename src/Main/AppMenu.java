@@ -102,7 +102,7 @@ public class AppMenu {
     public void run() {
         while (running) {
             try {
-                MenuDisplay.mostrarMenuPrincipal();
+                mostrarMenuPrincipal();
                 int opcion = Integer.parseInt(scanner.nextLine());
                 processOption(opcion);
             } catch (NumberFormatException e) {
@@ -110,6 +110,22 @@ public class AppMenu {
             }
         }
         scanner.close();
+    }
+
+    private static void mostrarMenuPrincipal() {
+        System.out.println("\n========= MENU =========");
+        System.out.println("1. Crear pedido");
+        System.out.println("2. Listar pedidos");
+        System.out.println("3. Actualizar pedido");
+        System.out.println("4. Eliminar pedido");
+        System.out.println("5. Crear envío");
+        System.out.println("6. Listar envíos");
+        System.out.println("7. Actualizar envío por ID");
+        System.out.println("8. Eliminar envío por ID");
+        System.out.println("9. Actualizar envío por ID de persona");
+        System.out.println("10. Eliminar envío por ID de persona");
+        System.out.println("0. Salir");
+        System.out.print("Ingrese una opcion: ");
     }
 
     /**

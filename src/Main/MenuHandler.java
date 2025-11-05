@@ -8,6 +8,7 @@ import java.util.Scanner;
 import Models.Envio;
 import Service.EnvioServiceImpl;
 import Service.PedidosServiceImpl;
+import java.time.LocalDate;
 
 /**
  * Controlador de las operaciones del menú (Menu Handler).
@@ -86,9 +87,16 @@ public class MenuHandler {
         try {
             System.out.print("Número de Tracking: ");
             String numeroPedido = scanner.nextLine().trim();
-            System.out.print("Fecha del Pedido: ");
+            System.out.println("Fecha del Pedido: ");
             // TODO: Parsear fecha desde scanner
-            Date fecha = new Date();
+
+            System.out.print("Ingrese dia del Pedido: (DD)");
+            int dia = Integer.parseInt(scanner.nextLine().trim());
+            System.out.print("Ingrese mes: (MM)");
+            int mes = (Integer.parseInt(scanner.nextLine().trim()));
+            System.out.print("Ingrese ano: (AAAA");
+            int ano = Integer.parseInt(scanner.nextLine().trim());
+            LocalDate fecha = LocalDate.of(ano, mes, dia);
             System.out.print("Nombre del Cliente: ");
             String nombreCliente = scanner.nextLine().trim();
             System.out.print("Total del Pedido: ");
@@ -494,8 +502,26 @@ public class MenuHandler {
         Envio.Estado estado = Envio.Estado.valueOf(scanner.nextLine().trim());
         System.out.print("Costo Envio: ");
         Double costo =  Double.parseDouble(scanner.nextLine());
-        Date fechaDespacho = new Date();
-        Date fechaEstimada = new Date();
+
+        System.out.print("Ingrese fecha despacho");
+        System.out.print("Ingrese dia (DD)");
+        int dia = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("Ingrese mes: (MM)");
+        int mes = (Integer.parseInt(scanner.nextLine().trim()));
+        System.out.print("Ingrese ano: (AAAA");
+        int ano = Integer.parseInt(scanner.nextLine().trim());
+        LocalDate fechaDespacho = LocalDate.of(ano, mes, dia);
+
+        System.out.print("Ingrese fecha estimada");
+        System.out.print("Ingrese dia (DD)");
+        int diaE = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("Ingrese mes: (MM)");
+        int mesE = (Integer.parseInt(scanner.nextLine().trim()));
+        System.out.print("Ingrese ano: (AAAA");
+        int anoE = Integer.parseInt(scanner.nextLine().trim());
+        LocalDate fechaEstimada = LocalDate.of(anoE, mesE, diaE);
+
+
 
         Envio envio = new Envio(0, false, tracking, empresa, tipo, costo, fechaDespacho, fechaEstimada, estado, pedido);
         this.enviosService.insertar(envio);

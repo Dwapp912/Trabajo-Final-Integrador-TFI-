@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
 
+
 /**
  * Entidad que representa una persona en el sistema.
  * Hereda de Base para obtener id y eliminado.
@@ -47,7 +48,7 @@ public class Pedido extends Base {
     /**
      * Fecha del pedido
      */
-    private Date fecha;
+    private LocalDate fecha;
 
     /**
      * Envio asociado al pedido.
@@ -60,7 +61,7 @@ public class Pedido extends Base {
      * Usado por PersonaDAO al mapear ResultSet.
      * El domicilio se asigna posteriormente con setDomicilio().
      */
-    public Pedido(int id, boolean eliminado, String numero, Date fecha, String clienteNombre,
+    public Pedido(int id, boolean eliminado, String numero, LocalDate fecha, String clienteNombre,
                   double total, Estado estado, Envio envio) {
         super(id, eliminado);
         this.numero = numero;
@@ -124,7 +125,7 @@ public class Pedido extends Base {
         this.envio = envio;
     }
 
-    public Date getFecha() {
+    public LocalDate getFecha() {
         return this.fecha;
     }
 

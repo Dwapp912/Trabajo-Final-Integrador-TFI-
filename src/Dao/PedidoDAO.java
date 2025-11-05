@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import Config.DatabaseConnection;
 import Models.Envio;
+import java.time.LocalDate;
 
 /**
  * Data Access Object para la entidad Persona.
@@ -443,7 +444,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
      */
     private void setearParametrosPedido(PreparedStatement stmt, Pedido pedido) throws SQLException {
         stmt.setString(1, pedido.getNumero());
-        stmt.setDate(2, new java.sql.Date(pedido.getFecha().getTime()));
+        stmt.setDate(2, java.sql.Date.valueOf(pedido.getFecha()));
         stmt.setString(3, pedido.getClienteNombre());
         stmt.setDouble(4, pedido.getTotal());
         stmt.setString(5, pedido.getEstado().toString());
@@ -527,11 +528,13 @@ public class PedidoDAO implements GenericDAO<Pedido> {
             envio = this.envioDAO.getById(envioId);
         }
         Pedido.Estado estado = Pedido.Estado.valueOf(rs.getString("estado"));
+        Date fecha = rs.getDate("fecha");
+        LocalDate pedidoFecha = fecha.toLocalDate();
         Pedido pedido = new Pedido(
                 rs.getInt("id"),
                 rs.getBoolean("eliminado"),
                 rs.getString("numero"),
-                rs.getDate("fecha"),
+                pedidoFecha,
                 rs.getString("clienteNombre"),
                 rs.getDouble("total"),
                 estado,

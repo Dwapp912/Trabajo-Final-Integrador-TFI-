@@ -2,6 +2,7 @@ package Models;
 
 import java.util.Date;
 import java.util.Objects;
+import java.time.LocalDate;
 
 /**
  * Entidad que representa un envio en el sistema.
@@ -56,13 +57,13 @@ public class Envio extends Base {
      * Fecha despacho.
      * Requerido.
      */
-    private Date fechaDespacho;
+    private LocalDate fechaDespacho;
 
     /**
      * Fecha estimada.
      * Requerido.
      */
-    private Date fechaEstimada; // nullable
+    private LocalDate fechaEstimada; // nullable
 
     /**
      * Estado actual del envío.
@@ -87,7 +88,7 @@ public class Envio extends Base {
      * @param pedido
      */
     public Envio(int id, boolean eliminado, String tracking, Empresa empresa, Tipo tipo, Double costo,
-                 Date fechaDespacho, Date fechaEstimada, Estado estado, Pedido pedido) {
+                 LocalDate fechaDespacho, LocalDate fechaEstimada, Estado estado, Pedido pedido) {
         super(id, eliminado);
         this.tracking = tracking;
         this.empresa = empresa;
@@ -150,19 +151,19 @@ public class Envio extends Base {
         this.costo = costo;
     }
 
-    public Date getFechaDespacho() {
+    public LocalDate getFechaDespacho() {
         return fechaDespacho;
     }
 
-    public void setFechaDespacho(Date fechaDespacho) {
+    public void setFechaDespacho(LocalDate fechaDespacho) {
         this.fechaDespacho = fechaDespacho;
     }
 
-    public Date getFechaEstimada() {
+    public LocalDate getFechaEstimada() {
         return fechaEstimada;
     }
 
-    public void setFechaEstimada(Date fechaEstimada) {
+    public void setFechaEstimada(LocalDate fechaEstimada) {
         this.fechaEstimada = fechaEstimada;
     }
 

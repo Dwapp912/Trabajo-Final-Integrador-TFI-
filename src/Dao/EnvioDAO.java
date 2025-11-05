@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import Config.DatabaseConnection;
 import Models.Envio;
+import java.time.LocalDate;
 
 /**
  * Data Access Object para la entidad Envio.
@@ -301,8 +302,8 @@ public class EnvioDAO implements GenericDAO<Envio> {
     private void setearParametrosEnvio(PreparedStatement stmt, Envio envio) throws SQLException {
         stmt.setString(1, envio.getTracking());
         stmt.setDouble(2, envio.getCosto());
-        stmt.setDate(3, new java.sql.Date(envio.getFechaDespacho().getTime()));
-        stmt.setDate(4, new java.sql.Date(envio.getFechaEstimada().getTime()));
+        stmt.setDate(2, java.sql.Date.valueOf(envio.getFechaDespacho()));
+        stmt.setDate(2, java.sql.Date.valueOf(envio.getFechaEstimada()));
         stmt.setString(5, envio.getTipo().toString());
         stmt.setString(6, envio.getEmpresa().toString());
         stmt.setString(7, envio.getEstado().toString());
@@ -348,6 +349,10 @@ public class EnvioDAO implements GenericDAO<Envio> {
      * @throws SQLException Si hay error al leer columnas del ResultSet
      */
     private Envio mapResultSetToEnvio(ResultSet rs) throws SQLException {
+        Date fecha = rs.getDate("fechaDespacho");
+        LocalDate fechaDespacho = fecha.toLocalDate();
+         Date fechaE = rs.getDate("fechaEstimada");
+        LocalDate fechaEstimada = fechaE.toLocalDate();
         return new Envio(
             rs.getInt("id"),
             rs.getBoolean("eliminado"),
@@ -355,8 +360,8 @@ public class EnvioDAO implements GenericDAO<Envio> {
             Envio.Empresa.valueOf(rs.getString("empresa")),
             Envio.Tipo.valueOf(rs.getString("tipo")),
             rs.getDouble("costo"),
-            rs.getDate("fechaDespacho"),
-            rs.getDate("fechaEstimada"),
+            fechaDespacho,
+            fechaEstimada,
             Envio.Estado.valueOf(rs.getString("estado")),
             null
         );

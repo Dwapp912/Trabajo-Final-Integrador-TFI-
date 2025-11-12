@@ -274,11 +274,11 @@ public class MenuHandler {
         try {
             List<Envio> envios = pedidosService.getEnvioService().getAll();
             if (envios.isEmpty()) {
-                System.out.println("No se encontraron domicilios.");
+                System.out.println("No se encontraron envios.");
                 return;
             }
             for (Envio d : envios) {
-                System.out.println("ID: " + d.getId() + ", " + d.getEmpresa() + " " + d.getTracking());
+                System.out.println("ID ded envio : " + d.getId() + " Empresa de envio: " + d.getEmpresa() + " Numero de tracking : " + d.getTracking());
             }
         } catch (Exception e) {
             System.err.println("Error al listar envíos: " + e.getMessage());
@@ -532,13 +532,11 @@ public class MenuHandler {
                     valido = false;
                     Envio envio = new Envio(0, false, tracking, empresa, tipo, costo, fechaDespacho, fechaEstimada, estado, pedido);
                     this.enviosService.insertar(envio);
-                    return envio;
                 }
             }
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             System.err.println("Error al eliminar envío: " + e.getMessage());
-            return null;
+
         }
         return null;
     }
@@ -550,7 +548,9 @@ public class MenuHandler {
             Pedido p = pedidosService.getById(id);
             if (p == null) {
                 System.out.println("Persona no encontrada.");
-                return;
+            }
+            else if (p.getEnvio()!= null){
+                System.out.println("La persona ya tiene un envio asignado");
             }
             else{
                 crearEnvio(p);

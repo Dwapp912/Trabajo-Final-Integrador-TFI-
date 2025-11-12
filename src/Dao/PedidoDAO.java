@@ -106,7 +106,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
             e.fechaEstimada,
             e.fechaDespacho,
             e.estado as estado_envio
-            FROM pedido p LEFT JOIN envio e ON e.pedidoId = p.id AND e.eliminado = TRUE
+            FROM pedido p LEFT JOIN envio e ON e.pedidoId = p.id AND e.eliminado = FALSE
             WHERE p.id = ? AND p.eliminado = FALSE;
         """;
 
@@ -353,7 +353,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
                 }
             }
         } catch (SQLException e) {
-            throw new Exception("Error al obtener énvio por ID: " + e.getMessage(), e);
+            throw new Exception("Error al obtener pedido por ID: " + e.getMessage(), e);
         }
         return null;
     }

@@ -249,12 +249,11 @@ public class MenuHandler {
      * - Usar opción 10: "Eliminar domicilio de una persona" (eliminarDomicilioPorPersona)
      * - Esa opción primero desasocia el domicilio, luego lo elimina (seguro)
      */
-    public void eliminarPersona() {
+    public void eliminarPedido() {
         try {
-            System.out.print("ID de la persona a eliminar: ");
+            System.out.print("ID del pedido a eliminar: ");
             int id = Integer.parseInt(scanner.nextLine());
             pedidosService.eliminar(id);
-            System.out.println("Persona eliminada exitosamente.");
         } catch (Exception e) {
             System.err.println("Error al eliminar persona: " + e.getMessage());
         }

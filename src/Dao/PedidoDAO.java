@@ -71,6 +71,14 @@ public class PedidoDAO implements GenericDAO<Pedido> {
                 eliminado = TRUE
             WHERE id = ?
     """;
+    
+      private static final String DELETE_STATUS_SQL = """
+            SELECT
+                eliminado
+            FROM
+                pedido    
+            WHERE id = ?
+    """;
 
     /**
      * Query para obtener persona por ID.
@@ -197,7 +205,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
      */
     public PedidoDAO(EnvioDAO envioDAO) {
         if (envioDAO == null) {
-            throw new IllegalArgumentException("DomicilioDAO no puede ser null");
+            throw new IllegalArgumentException("EnvioDAO no puede ser null");
         }
         this.envioDAO = envioDAO;
     }
@@ -295,16 +303,34 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     @Override
     public void eliminar(int id) throws Exception {
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(DELETE_SQL)) {
+             PreparedStatement stmt = conn.prepareStatement(DELETE_SQL); 
+             PreparedStatement stmt2 = conn.prepareStatement(DELETE_STATUS_SQL)) {
 
             stmt.setInt(1, id);
-            int rowsAffected = stmt.executeUpdate();
+            stmt2.setInt(1, id);
 
-            if (rowsAffected == 0) {
-                throw new SQLException("No se encontró persona con ID: " + id);
+            try (ResultSet rs = stmt2.executeQuery()) {
+                if (rs.next()) {
+                    if (rs.getBoolean("eliminado") == true) {
+                        System.out.println("El pedido ya ha sido eliminado anteriormente");
+                    } else {
+                        int rowsAffected = stmt.executeUpdate();
+
+                        if (rowsAffected == 0) {
+                            throw new SQLException("No se encontró persona con ID: " + id);
+                        }
+                        else{
+                            System.out.println("Persona eliminada exitosamente.");
+                        }
+                    }
+                }
+            } catch (SQLException e) {
+                throw new Exception("Error al eliminar pedido: " + e.getMessage(), e);
             }
+
         }
     }
+    
 
     /**
      * Obtiene una persona por su ID.
@@ -327,7 +353,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
                 }
             }
         } catch (SQLException e) {
-            throw new Exception("Error al obtener persona por ID: " + e.getMessage(), e);
+            throw new Exception("Error al obtener énvio por ID: " + e.getMessage(), e);
         }
         return null;
     }

@@ -161,7 +161,7 @@ public class AppMenu {
             case 1 -> menuHandler.crearPedido();
             case 2 -> menuHandler.listarPedidos();
             case 3 -> menuHandler.actualizarPedido();
-            case 4 -> menuHandler.eliminarPersona();
+            case 4 -> menuHandler.eliminarPedido();
             case 5 -> menuHandler.crearEnvio();
             case 6 -> menuHandler.listarEnvios();
             case 7 -> menuHandler.actualizarEnvioPorId();

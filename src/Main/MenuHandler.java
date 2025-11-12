@@ -255,7 +255,7 @@ public class MenuHandler {
             int id = Integer.parseInt(scanner.nextLine());
             pedidosService.eliminar(id);
         } catch (Exception e) {
-            System.err.println("Error al eliminar persona: " + e.getMessage());
+            System.err.println("Error al eliminar persona ingrese un nuumero valido mayor a 0 " + e.getMessage());
         }
     }
 
@@ -489,56 +489,8 @@ public class MenuHandler {
      *
      * @return Domicilio nuevo (no persistido, ID=0)
      */
-    public void crearEnvio()  {
-        try {
-            System.out.print("ID del pedido a asignar Envio: ");
-            int id = Integer.parseInt(scanner.nextLine());
-            Pedido p = pedidosService.getById(id);
-            if (p == null) {
-                System.out.println("Persona no encontrada.");
-                return;
-            }
-            System.out.print("Tracking: ");
-            String tracking = scanner.nextLine().trim();
-            System.out.print("Empresa: ");
-            Envio.Empresa empresa = Envio.Empresa.valueOf(scanner.nextLine().trim());
-            System.out.print("Tipo Envio: ");
-            Envio.Tipo tipo = Envio.Tipo.valueOf(scanner.nextLine().trim());
-            System.out.print("Estado Envio: ");
-            Envio.Estado estado = Envio.Estado.valueOf(scanner.nextLine().trim());
-            System.out.print("Costo Envio: ");
-            Double costo =  Double.parseDouble(scanner.nextLine());
-
-            System.out.print("Ingrese fecha despacho");
-            System.out.print("Ingrese dia (DD)");
-            int dia = Integer.parseInt(scanner.nextLine().trim());
-            System.out.print("Ingrese mes: (MM)");
-            int mes = (Integer.parseInt(scanner.nextLine().trim()));
-            System.out.print("Ingrese ano: (AAAA");
-            int ano = Integer.parseInt(scanner.nextLine().trim());
-            LocalDate fechaDespacho = LocalDate.of(ano, mes, dia);
-
-            System.out.print("Ingrese fecha estimada");
-            System.out.print("Ingrese dia (DD)");
-            int diaE = Integer.parseInt(scanner.nextLine().trim());
-            System.out.print("Ingrese mes: (MM)");
-            int mesE = (Integer.parseInt(scanner.nextLine().trim()));
-            System.out.print("Ingrese ano: (AAAA");
-            int anoE = Integer.parseInt(scanner.nextLine().trim());
-            LocalDate fechaEstimada = LocalDate.of(anoE, mesE, diaE);
-
-
-
-            Envio envio = new Envio(0, false, tracking, empresa, tipo, costo, fechaDespacho, fechaEstimada, estado,p);
-            this.enviosService.insertar(envio);
-
-        }
-        catch (Exception e) {
-            System.err.println("Error al crear envío: " + e.getMessage());
-
-        }
-
-    }
+   
+    
 
     public Envio crearEnvio(Pedido pedido){
         try{
@@ -553,36 +505,62 @@ public class MenuHandler {
             System.out.print("Costo Envio: ");
             Double costo =  Double.parseDouble(scanner.nextLine());
 
-            System.out.print("Ingrese fecha despacho");
+            System.out.println("Ingrese fecha despacho");
             System.out.print("Ingrese dia (DD)");
             int dia = Integer.parseInt(scanner.nextLine().trim());
             System.out.print("Ingrese mes: (MM)");
             int mes = (Integer.parseInt(scanner.nextLine().trim()));
-            System.out.print("Ingrese ano: (AAAA");
+            System.out.print("Ingrese ano: (AAAA) ");
             int ano = Integer.parseInt(scanner.nextLine().trim());
             LocalDate fechaDespacho = LocalDate.of(ano, mes, dia);
 
-            System.out.print("Ingrese fecha estimada");
-            System.out.print("Ingrese dia (DD)");
-            int diaE = Integer.parseInt(scanner.nextLine().trim());
-            System.out.print("Ingrese mes: (MM)");
-            int mesE = (Integer.parseInt(scanner.nextLine().trim()));
-            System.out.print("Ingrese ano: (AAAA");
-            int anoE = Integer.parseInt(scanner.nextLine().trim());
-            LocalDate fechaEstimada = LocalDate.of(anoE, mesE, diaE);
+            boolean valido=true;
+            
+            while (valido == true) {
+                System.out.println("Ingrese fecha estimada de llegada");
+                System.out.print("Ingrese dia (DD)");
+                int diaE = Integer.parseInt(scanner.nextLine().trim());
+                System.out.print("Ingrese mes: (MM)");
+                int mesE = (Integer.parseInt(scanner.nextLine().trim()));
+                System.out.print("Ingrese ano: (AAAA) ");
+                int anoE = Integer.parseInt(scanner.nextLine().trim());
+                LocalDate fechaEstimada = LocalDate.of(anoE, mesE, diaE);
 
-
-
-            Envio envio = new Envio(0, false, tracking, empresa, tipo, costo, fechaDespacho, fechaEstimada, estado, pedido);
-            this.enviosService.insertar(envio);
-            return envio;
+                if (fechaEstimada.isBefore(fechaDespacho)) {
+                    System.out.println("la Fecha Estimada de llegada no puede ser menor a la de despacho");
+                } else {
+                    valido = false;
+                    Envio envio = new Envio(0, false, tracking, empresa, tipo, costo, fechaDespacho, fechaEstimada, estado, pedido);
+                    this.enviosService.insertar(envio);
+                    return envio;
+                }
+            }
         }
         catch(Exception e) {
             System.err.println("Error al eliminar envío: " + e.getMessage());
             return null;
         }
+        return null;
     }
+    
+     public void crearEnvio() {
+        try {
+            System.out.print("ID del pedido a asignar Envio: ");
+            int id = Integer.parseInt(scanner.nextLine());
+            Pedido p = pedidosService.getById(id);
+            if (p == null) {
+                System.out.println("Persona no encontrada.");
+                return;
+            }
+            else{
+                crearEnvio(p);
+            }
+        } catch (Exception e) {
+            System.err.println("Error al crear envío: " + e.getMessage());
 
+        }
+
+    }
     /**
      * Método auxiliar privado: Maneja actualización de domicilio dentro de actualizar persona.
      *

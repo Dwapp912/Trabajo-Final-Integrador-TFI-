@@ -317,10 +317,10 @@ public class PedidoDAO implements GenericDAO<Pedido> {
                         int rowsAffected = stmt.executeUpdate();
 
                         if (rowsAffected == 0) {
-                            throw new SQLException("No se encontró persona con ID: " + id);
+                            throw new SQLException("No se encontró pedido con ID: " + id);
                         }
                         else{
-                            System.out.println("Persona eliminada exitosamente.");
+                            System.out.println("Pedido eliminado exitosamente.");
                         }
                     }
                 }

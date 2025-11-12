@@ -22,20 +22,20 @@ public class EnvioServiceImpl implements GenericService<Envio> {
      * Inyectado en el constructor (Dependency Injection).
      * Usa GenericDAO para permitir testing con mocks.
      */
-    private final GenericDAO<Envio> domicilioDAO;
+    private final GenericDAO<Envio> envioDAO;
 
     /**
      * Constructor con inyección de dependencias.
      * Valida que el DAO no sea null (fail-fast).
      *
-     * @param domicilioDAO DAO de domicilios (normalmente DomicilioDAO)
-     * @throws IllegalArgumentException si domicilioDAO es null
+     * @param envioDAO DAO de domicilios (normalmente DomicilioDAO)
+     * @throws IllegalArgumentException si envioDAO es null
      */
-    public EnvioServiceImpl(GenericDAO<Envio> domicilioDAO) {
-        if (domicilioDAO == null) {
+    public EnvioServiceImpl(GenericDAO<Envio> envioDAO) {
+        if (envioDAO == null) {
             throw new IllegalArgumentException("DomicilioDAO no puede ser null");
         }
-        this.domicilioDAO = domicilioDAO;
+        this.envioDAO = envioDAO;
     }
 
     /**
@@ -52,7 +52,7 @@ public class EnvioServiceImpl implements GenericService<Envio> {
     @Override
     public void insertar(Envio envio) throws Exception {
         validateEnvio(envio);
-        domicilioDAO.insertar(envio);
+        envioDAO.insertar(envio);
     }
 
     /**
@@ -74,7 +74,7 @@ public class EnvioServiceImpl implements GenericService<Envio> {
         if (envio.getId() <= 0) {
             throw new IllegalArgumentException("El ID del domicilio debe ser mayor a 0 para actualizar");
         }
-        domicilioDAO.actualizar(envio);
+        envioDAO.actualizar(envio);
     }
 
     /**
@@ -95,7 +95,7 @@ public class EnvioServiceImpl implements GenericService<Envio> {
         if (id <= 0) {
             throw new IllegalArgumentException("El ID debe ser mayor a 0");
         }
-        domicilioDAO.eliminar(id);
+        envioDAO.eliminar(id);
     }
 
     /**
@@ -110,7 +110,7 @@ public class EnvioServiceImpl implements GenericService<Envio> {
         if (id <= 0) {
             throw new IllegalArgumentException("El ID debe ser mayor a 0");
         }
-        return domicilioDAO.getById(id);
+        return envioDAO.getById(id);
     }
 
     /**
@@ -121,7 +121,7 @@ public class EnvioServiceImpl implements GenericService<Envio> {
      */
     @Override
     public List<Envio> getAll() throws Exception {
-        return domicilioDAO.getAll();
+        return envioDAO.getAll();
     }
 
     /**
@@ -136,7 +136,7 @@ public class EnvioServiceImpl implements GenericService<Envio> {
      */
     private void validateEnvio(Envio envio) {
         if (envio == null) {
-            throw new IllegalArgumentException("El domicilio no puede ser null");
+            throw new IllegalArgumentException("El envio no puede ser null");
         }
         if (envio.getTracking() == null || envio.getTracking().trim().isEmpty()) {
             throw new IllegalArgumentException("El número no puede estar vacío");

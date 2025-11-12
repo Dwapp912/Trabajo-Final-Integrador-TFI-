@@ -315,7 +315,7 @@ public class MenuHandler {
             Envio envio = pedidosService.getEnvioService().getById(id);
 
             if (envio == null) {
-                System.out.println("Domicilio no encontrado.");
+                System.out.println("Envio no encontrado.");
                 return;
             }
 

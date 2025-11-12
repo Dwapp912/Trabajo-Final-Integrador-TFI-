@@ -55,7 +55,9 @@ public class EnvioDAO implements GenericDAO<Envio> {
      * ⚠️ IMPORTANTE: Si varias personas comparten este domicilio,
      * la actualización los afectará a TODAS (RN-040).
      */
-    private static final String UPDATE_SQL = """
+    
+    
+     private static final String UPDATE_SQL = """
         UPDATE
             envio
         SET
@@ -68,7 +70,8 @@ public class EnvioDAO implements GenericDAO<Envio> {
             estado = ?
         WHERE id = ?
     """;
-
+       
+    
     /**
      * Query de soft delete.
      * Marca eliminado=TRUE sin borrar físicamente la fila.

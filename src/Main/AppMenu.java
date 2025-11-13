@@ -63,7 +63,7 @@ public class AppMenu {
      */
     public AppMenu() {
         this.scanner = new Scanner(System.in);
-        this.menuHandler = new MenuHandler(scanner, createPersonaService(), createEnviosService());
+        this.menuHandler = new MenuHandler(scanner, createPedidosService(), createEnviosService());
         this.running = true;
     }
 
@@ -122,8 +122,8 @@ public class AppMenu {
         System.out.println("6. Listar envíos");
         System.out.println("7. Actualizar envío por ID");
         System.out.println("8. Eliminar envío por ID");
-        System.out.println("9. Actualizar envío por ID de persona");
-        System.out.println("10. Eliminar envío por ID de persona");
+        System.out.println("9. Actualizar envío por ID de pedido");
+        System.out.println("10. Eliminar envío por ID de pedido");
         System.out.println("0. Salir");
         System.out.print("Ingrese una opcion: ");
     }
@@ -207,7 +207,7 @@ public class AppMenu {
      *
      * @return PersonaServiceImpl completamente inicializado con todas sus dependencias
      */
-    private PedidosServiceImpl createPersonaService() {
+    private PedidosServiceImpl createPedidosService() {
         EnvioDAO envioDAO = new EnvioDAO();
         PedidoDAO pedidoDAO = new PedidoDAO(envioDAO);
         EnvioServiceImpl domicilioService = new EnvioServiceImpl(envioDAO);

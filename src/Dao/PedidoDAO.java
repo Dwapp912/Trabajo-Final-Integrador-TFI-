@@ -282,7 +282,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
-                throw new SQLException("No se pudo actualizar la persona con ID: " + pedido.getId());
+                throw new SQLException("No se pudo actualizar el pedido con ID: " + pedido.getId());
             }
         }
     }
@@ -380,7 +380,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
                 pedidos.add(mapResultSetToPedido(rs));
             }
         } catch (SQLException e) {
-            throw new Exception("Error al obtener todas las personas: " + e.getMessage(), e);
+            throw new Exception("Error al obtener todos los pedidos: " + e.getMessage(), e);
         }
         return pedidos;
     }
@@ -496,7 +496,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
             if (generatedKeys.next()) {
                 pedido.setId(generatedKeys.getInt(1));
             } else {
-                throw new SQLException("La inserción de la persona falló, no se obtuvo ID generado");
+                throw new SQLException("La inserción del pedido falló, no se obtuvo ID generado");
             }
         }
     }

@@ -73,7 +73,7 @@ public class Pedido extends Base {
         this.envio = envio;
     }
 
-    /** Constructor por defecto para crear una persona nueva sin ID. */
+    /** Constructor por defecto para crear un pedido nuevo sin ID. */
     public Pedido() {
         super();
     }

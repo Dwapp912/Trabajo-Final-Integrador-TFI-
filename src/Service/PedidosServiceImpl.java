@@ -6,7 +6,7 @@ import java.util.List;
 import Dao.PedidoDAO;
 
 /**
- * Implementación del servicio de negocio para la entidad Persona.
+ * Implementación del servicio de negocio para la entidad Pedido.
  * Capa intermedia entre la UI y el DAO que aplica validaciones de negocio complejas.
  *
  * Responsabilidades:
@@ -44,7 +44,7 @@ public class PedidosServiceImpl implements GenericService<Pedido> {
      */
     public PedidosServiceImpl(PedidoDAO pedidoDAO, EnvioServiceImpl envioServiceImpl) {
         if (pedidoDAO == null) {
-            throw new IllegalArgumentException("PersonaDAO no puede ser null");
+            throw new IllegalArgumentException("PedidoDAO no puede ser null");
         }
         if (envioServiceImpl == null) {
             throw new IllegalArgumentException("DomicilioServiceImpl no puede ser null");
@@ -109,7 +109,7 @@ public class PedidosServiceImpl implements GenericService<Pedido> {
     public void actualizar(Pedido pedido) throws Exception {
         validarPedido(pedido);
         if (pedido.getId() <= 0) {
-            throw new IllegalArgumentException("El ID de la persona debe ser mayor a 0 para actualizar");
+            throw new IllegalArgumentException("El ID del pedido debe ser mayor a 0 para actualizar");
         }
         validateNumeroUnique(pedido.getNumero(), pedido.getId());
         pedidoDAO.actualizar(pedido);
@@ -243,11 +243,11 @@ public class PedidosServiceImpl implements GenericService<Pedido> {
 
         Pedido pedido = pedidoDAO.getById(pedidoId);
         if (pedido == null) {
-            throw new IllegalArgumentException("Persona no encontrada con ID: " + pedidoId);
+            throw new IllegalArgumentException("Pedido no encontrado con ID: " + pedidoId);
         }
 
         if (pedido.getEnvio() == null || pedido.getEnvio().getId() != envioId) {
-            throw new IllegalArgumentException("El domicilio no pertenece a esta persona");
+            throw new IllegalArgumentException("El envío no pertenece a este pedido");
         }
 
         // Secuencia transaccional: actualizar FK → eliminar domicilio
@@ -309,7 +309,7 @@ public class PedidosServiceImpl implements GenericService<Pedido> {
             // Existe una persona con ese DNI
             if (pedidoId == null || existente.getId() != pedidoId) {
                 // Es INSERT (personaId == null) o es UPDATE pero el DNI pertenece a otra persona
-                throw new IllegalArgumentException("Ya existe una persona con el DNI: " + numeroEnvio);
+                throw new IllegalArgumentException("Ya existe un pedido con el número: " + numeroEnvio);
             }
             // Si llegamos aquí: es UPDATE y el DNI pertenece a la misma persona → OK
         }

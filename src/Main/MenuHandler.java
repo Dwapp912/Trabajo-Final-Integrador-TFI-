@@ -54,7 +54,7 @@ public class MenuHandler {
             throw new IllegalArgumentException("Scanner no puede ser null");
         }
         if (pedidosService == null) {
-            throw new IllegalArgumentException("PersonaService no puede ser null");
+            throw new IllegalArgumentException("PedidosService no puede ser null");
         }
         this.scanner = scanner;
         this.pedidosService = pedidosService;
@@ -204,7 +204,7 @@ public class MenuHandler {
             Pedido p = pedidosService.getById(id);
 
             if (p == null) {
-                System.out.println("Persona no encontrada.");
+                System.out.println("Pedido no encontrado.");
                 return;
             }
 
@@ -616,10 +616,10 @@ public class MenuHandler {
             int id = Integer.parseInt(scanner.nextLine());
             Pedido p = pedidosService.getById(id);
             if (p == null) {
-                System.out.println("Persona no encontrada.");
+                System.out.println("Pedido no encontrado.");
             }
             else if (p.getEnvio()!=null){                
-                System.out.println("La persona ya tiene un envio asignado");
+                System.out.println("El pedido ya tiene un envío asignado");
                 }
             else{
                 crearEnvio(p);
@@ -646,9 +646,6 @@ public class MenuHandler {
      *    - Asocia domicilio a la persona
      *
      * Usado exclusivamente por actualizarPersona() (opción 3).
-     *
-     * IMPORTANTE: El parámetro Persona se modifica in-place (setDomicilio).
-     * El caller debe invocar personaService.actualizar() después para persistir.
      *
      * @param p Persona a la que se le actualizará/agregará domicilio
      * @throws Exception Si hay error al insertar/actualizar domicilio

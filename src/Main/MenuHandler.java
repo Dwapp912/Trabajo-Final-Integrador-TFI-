@@ -169,27 +169,23 @@ public class MenuHandler {
      * Opción 3: Actualizar pedido existente.
      *
      * Flujo:
-     * 1. Solicita ID de la persona
-     * 2. Obtiene persona actual de la BD
+     * 1. Solicita ID del pedido
+     * 2. Obtiene el pedido actual de la BD
      * 3. Muestra valores actuales y permite actualizar:
-     *    - Nombre (Enter para mantener actual)
-     *    - Apellido (Enter para mantener actual)
-     *    - DNI (Enter para mantener actual)
-     * 4. Llama a actualizarDomicilioDePersona() para manejar cambios en domicilio
-     * 5. Invoca personaService.actualizar() que valida:
-     *    - Datos obligatorios (nombre, apellido, DNI)
-     *    - DNI único (RN-001), excepto para la misma persona
+     *    - Número de pedido (Enter para mantener actual)
+     *    - Nombre del cliente (Enter para mantener actual)
+     *    - Total (Enter para mantener actual)
+     * 4. Llama a actualizarEnvioDePedido() para manejar cambios en el envío asociado
+     * 5. Invoca pedidosService.actualizar() que valida:
+     *    - Datos obligatorios (número, cliente, total)
+     *    - Número de pedido único (RN-001), excepto para el mismo pedido
      *
      * Patrón "Enter para mantener":
      * - Lee input con scanner.nextLine().trim()
      * - Si isEmpty() → NO actualiza el campo (mantiene valor actual)
      * - Si tiene valor → Actualiza el campo
      *
-     * IMPORTANTE: Esta operación NO actualiza el domicilio directamente.
-     * El domicilio se maneja en actualizarDomicilioDePersona() que puede:
-     * - Actualizar domicilio existente (afecta a TODAS las personas que lo comparten)
-     * - Agregar nuevo domicilio si la persona no tenía
-     * - Dejar domicilio sin cambios
+     * Nota: La actualización del envío se realiza con actualizarEnvioDePedido().
      */
     public void actualizarPedido() {
         try {
@@ -230,21 +226,18 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 4: Eliminar persona (soft delete).
+     * Opción 4: Eliminar pedido (soft delete).
      *
      * Flujo:
-     * 1. Solicita ID de la persona
-     * 2. Invoca personaService.eliminar() que:
-     *    - Marca persona.eliminado = TRUE
-     *    - NO elimina el domicilio asociado (RN-037)
+     * 1. Solicita ID del pedido
+     * 2. Invoca pedidosService.eliminar() que:
+     *    - Marca pedido.eliminado = TRUE
+     *    - NO elimina el envío asociado automáticamente
      *
-     * IMPORTANTE: El domicilio NO se elimina porque:
-     * - Múltiples personas pueden compartir un domicilio
-     * - Si se eliminara, afectaría a otras personas
-     *
-     * Si se quiere eliminar también el domicilio:
-     * - Usar opción 10: "Eliminar domicilio de una persona" (eliminarDomicilioPorPersona)
-     * - Esa opción primero desasocia el domicilio, luego lo elimina (seguro)
+     * Nota: El envío no se elimina automáticamente para evitar inconsistencias.
+     * Si también desea eliminar el envío asociado de forma segura:
+     * - Use la opción 10: "Eliminar envío por ID de pedido" (eliminarEnvioDePedido)
+     * - Esa opción primero desasocia el envío del pedido y luego lo elimina
      */
     public void eliminarPedido() {
         try {
@@ -257,15 +250,15 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 6: Listar todos los domicilios activos.
+     * Opción 6: Listar todos los envíos activos.
      *
-     * Muestra: ID, Calle Número
+     * Muestra: ID, Empresa, Tracking, Tipo, Estado y Costo
      *
      * Uso típico:
-     * - Ver domicilios disponibles antes de asignar a persona (opción 7)
-     * - Consultar ID de domicilio para actualizar (opción 9) o eliminar (opción 8)
+     * - Ver envíos disponibles
+     * - Consultar ID de envío para actualizar (opción 7) o eliminar (opción 8)
      *
-     * Nota: Solo muestra domicilios con eliminado=FALSE (soft delete).
+     * Nota: Solo muestra envíos con eliminado=FALSE (soft delete), según la implementación del servicio.
      */
     public void listarEnvios() {
         try {
@@ -283,27 +276,22 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 9: Actualizar domicilio por ID.
+     * Opción 7: Actualizar envío por ID.
      *
      * Flujo:
-     * 1. Solicita ID del domicilio
-     * 2. Obtiene domicilio actual de la BD
+     * 1. Solicita ID del envío
+     * 2. Obtiene el envío actual de la BD
      * 3. Muestra valores actuales y permite actualizar:
-     *    - Calle (Enter para mantener actual)
-     *    - Número (Enter para mantener actual)
-     * 4. Invoca domicilioService.actualizar()
+     *    - Empresa (Enter para mantener actual)
+     *    - Tracking (Enter para mantener actual)
+     *    - Tipo (Enter para mantener actual)
+     *    - Estado (Enter para mantener actual)
+     *    - Costo (Enter para mantener actual)
+     *    - Fecha de despacho (Enter para mantener actual)
+     * 4. Invoca envioService.actualizar()
      *
-     * ⚠️ IMPORTANTE (RN-040): Si varias personas comparten este domicilio,
-     * la actualización los afectará a TODAS.
-     *
-     * Ejemplo:
-     * - Domicilio ID=1 "Av. Siempreviva 742" está asociado a 3 personas
-     * - Si se actualiza a "Calle Nueva 123", las 3 personas tendrán la nueva dirección
-     *
-     * Esto es CORRECTO para familias que viven juntas.
-     * Si se quiere cambiar la dirección de UNA sola persona:
-     * 1. Crear nuevo domicilio (opción 5)
-     * 2. Asignar a la persona (opción 7)
+     * Patrón "Enter para mantener":
+     * - Si el usuario presiona Enter sin texto, se mantiene el valor actual
      */
     public void actualizarEnvioPorId() {
         try {
@@ -409,28 +397,23 @@ public class MenuHandler {
 
 
     /**
-     * Opción 8: Eliminar domicilio por ID (PELIGROSO - soft delete directo).
+     * Opción 8: Eliminar envío por ID (PELIGROSO si está asociado a un pedido).
      *
-     * ⚠️ PELIGRO (RN-029): Este método NO verifica si hay personas asociadas.
-     * Si hay personas con FK a este domicilio, quedarán con referencia huérfana.
+     * Advertencia: Este método elimina el envío por su ID sin verificar si está asociado a un pedido.
+     * Si hay un pedido referenciando este envío, podría dejar datos inconsistentes.
      *
      * Flujo:
-     * 1. Solicita ID del domicilio
-     * 2. Invoca domicilioService.eliminar() directamente
-     * 3. Marca domicilio.eliminado = TRUE
+     * 1. Solicita ID del envío
+     * 2. Invoca envioService.eliminar() directamente (soft delete)
      *
-     * Problemas potenciales:
-     * - Personas con domicilio_id apuntando a domicilio "eliminado"
-     * - Datos inconsistentes en la BD
-     *
-     * ALTERNATIVA SEGURA: Opción 10 (eliminarDomicilioPorPersona)
-     * - Primero desasocia domicilio de la persona (domicilio_id = NULL)
-     * - Luego elimina el domicilio
-     * - Garantiza consistencia
+     * Alternativa segura: Opción 10 (eliminarEnvioDePedido)
+     * - Primero desasocia el envío del pedido
+     * - Luego elimina el envío
+     * - Garantiza consistencia referencial
      *
      * Uso válido:
-     * - Cuando se está seguro de que el domicilio NO tiene personas asociadas
-     * - Limpiar domicilios creados por error
+     * - Cuando se está seguro de que el envío NO está asociado a ningún pedido
+     * - Limpiar envíos creados por error
      */
     public void eliminarEnvioPorId() {
         try {
@@ -444,24 +427,16 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 7: Actualizar domicilio de una persona específica.
+     * Opción 9: Actualizar envío por ID de pedido.
      *
      * Flujo:
-     * 1. Solicita ID de la persona
-     * 2. Verifica que la persona exista y tenga domicilio
-     * 3. Muestra valores actuales del domicilio
-     * 4. Permite actualizar calle y número
-     * 5. Invoca domicilioService.actualizar()
+     * 1. Solicita ID del pedido
+     * 2. Verifica que el pedido exista y tenga envío asociado
+     * 3. Muestra valores actuales del envío
+     * 4. Permite actualizar campos del envío (empresa, tracking, tipo, estado, costo, fecha)
+     * 5. Invoca envioService.actualizar()
      *
-     * ⚠️ IMPORTANTE (RN-040): Esta operación actualiza el domicilio compartido.
-     * Si otras personas tienen el mismo domicilio, también se les actualizará.
-     *
-     * Diferencia con opción 9 (actualizarDomicilioPorId):
-     * - Esta opción: Busca persona primero, luego actualiza su domicilio
-     * - Opción 9: Actualiza domicilio directamente por ID
-     *
-     * Ambas tienen el mismo efecto (RN-040): afectan a TODAS las personas
-     * que comparten el domicilio.
+     * Nota: Esta opción toma el envío desde el pedido para asegurar que se actualice el correcto.
      */
     public void actualizarEnvioPorPedido() {
         try {
@@ -488,22 +463,21 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 10: Eliminar domicilio de una persona (MÉTODO SEGURO - RN-029 solucionado).
+     * Opción 10: Eliminar envío por ID de pedido (MÉTODO SEGURO).
      *
      * Flujo transaccional SEGURO:
-     * 1. Solicita ID de la persona
-     * 2. Verifica que la persona exista y tenga domicilio
-     * 3. Invoca personaService.eliminarDomicilioDePersona() que:
-     *    a. Desasocia domicilio de persona (persona.domicilio = null)
-     *    b. Actualiza persona en BD (domicilio_id = NULL)
-     *    c. Elimina el domicilio (ahora no hay FKs apuntando a él)
+     * 1. Solicita ID del pedido
+     * 2. Verifica que el pedido exista y tenga envío
+     * 3. Invoca pedidosService.eliminarEnvioDePedido() que:
+     *    a. Desasocia el envío del pedido (pedido.envio = null)
+     *    b. Actualiza pedido en BD (quita la relación)
+     *    c. Elimina el envío (ya sin referencias)
      *
-     * Ventaja sobre opción 8 (eliminarDomicilioPorId):
-     * - Garantiza consistencia: Primero actualiza FK, luego elimina
-     * - NO deja referencias huérfanas
-     * - Implementa eliminación segura recomendada en RN-029
+     * Ventaja sobre opción 8 (eliminarEnvioPorId):
+     * - Garantiza consistencia: Primero actualiza la FK, luego elimina
+     * - Evita referencias huérfanas
      *
-     * Este es el método RECOMENDADO para eliminar domicilios en producción.
+     * Este es el método RECOMENDADO para eliminar envíos cuando están asociados a un pedido.
      */
     public void eliminarEnvioDePedido() {
         try {

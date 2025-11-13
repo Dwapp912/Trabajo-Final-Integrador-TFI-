@@ -72,7 +72,7 @@ public class EnvioServiceImpl implements GenericService<Envio> {
     public void actualizar(Envio envio) throws Exception {
         validateEnvio(envio);
         if (envio.getId() <= 0) {
-            throw new IllegalArgumentException("El ID del domicilio debe ser mayor a 0 para actualizar");
+            throw new IllegalArgumentException("El ID del envio debe ser mayor a 0 para actualizar");
         }
         envioDAO.actualizar(envio);
     }

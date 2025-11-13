@@ -61,16 +61,18 @@ public class EnvioDAO implements GenericDAO<Envio> {
         UPDATE
             envio
         SET
-            tracking = ?,
-            costo = ?,
-            fechaDespacho = ?,
-            fechaEstimada = ?,
-            tipo = ?,
-            empresa = ?
-            estado = ?
+           tracking = ?,
+           empresa = ?,  
+           tipo = ?, 
+           estado = ? , 
+           costo = ?,
+           fechaDespacho = ?                                  
+                                                                                     
         WHERE id = ?
     """;
        
+      /**
+              **/
     
     /**
      * Query de soft delete.
@@ -189,9 +191,10 @@ public class EnvioDAO implements GenericDAO<Envio> {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(UPDATE_SQL)) {
             setearParametrosEnvio(stmt, envio);
-            stmt.setInt(8, envio.getId());
+            stmt.setInt(7, envio.getId());
 
             int rowsAffected = stmt.executeUpdate();
+            System.out.println(rowsAffected);
             if (rowsAffected == 0) {
                 throw new SQLException("No se pudo actualizar el domicilio con ID: " + envio.getId());
             }
@@ -304,17 +307,12 @@ public class EnvioDAO implements GenericDAO<Envio> {
      */
     private void setearParametrosEnvio(PreparedStatement stmt, Envio envio) throws SQLException {
         stmt.setString(1, envio.getTracking());
-        stmt.setDouble(2, envio.getCosto());
-        stmt.setDate(3, java.sql.Date.valueOf(envio.getFechaDespacho()));
-        stmt.setDate(4, java.sql.Date.valueOf(envio.getFechaEstimada()));
-        stmt.setString(5, envio.getTipo().toString());
-        stmt.setString(6, envio.getEmpresa().toString());
-        stmt.setString(7, envio.getEstado().toString());
-        if (envio.getPedidoId() > 0) {
-            stmt.setInt(8, envio.getPedidoId());
-        } else {
-            stmt.setNull(8, Types.INTEGER);
-        }
+        stmt.setDouble(5, envio.getCosto());
+        stmt.setDate(6, java.sql.Date.valueOf(envio.getFechaDespacho()));        
+        stmt.setString(3, envio.getTipo().toString());
+        stmt.setString(2, envio.getEmpresa().toString());
+        stmt.setString(4, envio.getEstado().toString());
+       
 
     }
 

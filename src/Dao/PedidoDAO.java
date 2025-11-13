@@ -106,7 +106,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
             e.fechaEstimada,
             e.fechaDespacho,
             e.estado as estado_envio
-            FROM pedido p LEFT JOIN envio e ON e.pedidoId = p.id AND e.eliminado = FALSE
+            FROM pedido p LEFT JOIN envio e ON e.pedidoId = p.id 
             WHERE p.id = ? AND p.eliminado = FALSE;
         """;
 
@@ -350,6 +350,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return mapResultSetToPedido(rs);
+                   
                 }
             }
         } catch (SQLException e) {
@@ -551,7 +552,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
         int envioId = rs.getInt("envio_id");
         Envio envio = null;
         if (envioId > 0 && !rs.wasNull()) {
-            envio = this.envioDAO.getById(envioId);
+            envio = envioDAO.getById(envioId);
         }
         Pedido.Estado estado = Pedido.Estado.valueOf(rs.getString("estado"));
         Date fecha = rs.getDate("fecha");

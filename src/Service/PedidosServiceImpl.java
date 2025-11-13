@@ -147,6 +147,7 @@ public class PedidosServiceImpl implements GenericService<Pedido> {
         if (id <= 0) {
             throw new IllegalArgumentException("El ID debe ser mayor a 0");
         }
+        
         return pedidoDAO.getById(id);
     }
 

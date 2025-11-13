@@ -310,7 +310,7 @@ public class MenuHandler {
      */
     public void actualizarEnvioPorId() {
         try {
-            System.out.print("ID del domicilio a actualizar: ");
+            System.out.print("ID del envio a actualizar: ");
             int id = Integer.parseInt(scanner.nextLine());
             Envio envio = pedidosService.getEnvioService().getById(id);
 
@@ -330,6 +330,42 @@ public class MenuHandler {
             String numero = scanner.nextLine().trim();
             if (!numero.isEmpty()) {
                 envio.setTracking(numero);
+            }
+
+            System.out.print("Nuevo Tipo (actual: " + envio.getTipo() + ", Enter para mantener): ");
+            String tipo = scanner.nextLine().trim();
+            if (!tipo.isEmpty()) {
+                envio.setTipo(Envio.Tipo.valueOf(tipo));
+
+            }
+
+            System.out.print("Nuevo Estado (actual: " + envio.getEstado() + ", Enter para mantener): ");
+            String estado = scanner.nextLine().trim();
+            if (!estado.isEmpty()) {
+                envio.setEstado(Envio.Estado.valueOf(estado));
+
+            }
+
+            System.out.print("Nuevo costo (actual: " + envio.getCosto() + ", Enter para mantener): ");
+            double costo = Double.parseDouble(scanner.nextLine());
+            if (costo > 0) {
+                envio.setCosto(costo);
+            }
+
+            System.out.print("Nuevo fecha de despacho (actual: " + envio.getFechaDespacho() + ", Enter para mantener): ");
+            System.out.print("Ingrese dia (DD) ");
+            int dia = Integer.parseInt(scanner.nextLine().trim());
+            System.out.print("Ingrese mes: (MM) ");
+            int mes = (Integer.parseInt(scanner.nextLine().trim()));
+            System.out.print("Ingrese ano: (AAAA) ");
+            int ano = Integer.parseInt(scanner.nextLine().trim());
+            LocalDate fecha = LocalDate.of(ano, mes, dia);
+
+            if (fecha != null) {
+                envio.setFechaDespacho(fecha);
+                System.out.println(envio.getFechaDespacho());
+            } else {
+
             }
 
             pedidosService.getEnvioService().actualizar(envio);
@@ -492,8 +528,8 @@ public class MenuHandler {
    
     
 
-    public Envio crearEnvio(Pedido pedido){
-        try{
+    public Envio crearEnvio(Pedido pedido) {
+        try {
             System.out.print("Tracking: ");
             String tracking = scanner.nextLine().trim();
             System.out.print("Empresa: ");
@@ -503,20 +539,29 @@ public class MenuHandler {
             System.out.print("Estado Envio: ");
             Envio.Estado estado = Envio.Estado.valueOf(scanner.nextLine().trim());
             System.out.print("Costo Envio: ");
-            Double costo =  Double.parseDouble(scanner.nextLine());
+            Double costo = Double.parseDouble(scanner.nextLine());
 
-            System.out.println("Ingrese fecha despacho");
-            System.out.print("Ingrese dia (DD)");
-            int dia = Integer.parseInt(scanner.nextLine().trim());
-            System.out.print("Ingrese mes: (MM)");
-            int mes = (Integer.parseInt(scanner.nextLine().trim()));
-            System.out.print("Ingrese ano: (AAAA) ");
-            int ano = Integer.parseInt(scanner.nextLine().trim());
-            LocalDate fechaDespacho = LocalDate.of(ano, mes, dia);
+            LocalDate fechaDespacho = null;
 
-            boolean valido=true;
-            
-            while (valido == true) {
+            do {
+                System.out.println("Ingrese fecha despacho");
+                System.out.print("Ingrese dia (DD)");
+                int dia = Integer.parseInt(scanner.nextLine().trim());
+                System.out.print("Ingrese mes: (MM)");
+                int mes = (Integer.parseInt(scanner.nextLine().trim()));
+                System.out.print("Ingrese ano: (AAAA) ");
+                int ano = Integer.parseInt(scanner.nextLine().trim());
+                fechaDespacho = LocalDate.of(ano, mes, dia);
+                if (fechaDespacho.isBefore(pedido.getFecha())){
+                    System.out.println("La fecha de despacho no puede ser anterior a la del pedido");
+                }
+            } while (fechaDespacho.isBefore(pedido.getFecha()));
+            {
+
+            }
+            LocalDate fechaEstimada = null;
+
+            do {
                 System.out.println("Ingrese fecha estimada de llegada");
                 System.out.print("Ingrese dia (DD)");
                 int diaE = Integer.parseInt(scanner.nextLine().trim());
@@ -524,18 +569,18 @@ public class MenuHandler {
                 int mesE = (Integer.parseInt(scanner.nextLine().trim()));
                 System.out.print("Ingrese ano: (AAAA) ");
                 int anoE = Integer.parseInt(scanner.nextLine().trim());
-                LocalDate fechaEstimada = LocalDate.of(anoE, mesE, diaE);
+                fechaEstimada = LocalDate.of(anoE, mesE, diaE);
 
                 if (fechaEstimada.isBefore(fechaDespacho)) {
                     System.out.println("la Fecha Estimada de llegada no puede ser menor a la de despacho");
                 } else {
-                    valido = false;
                     Envio envio = new Envio(0, false, tracking, empresa, tipo, costo, fechaDespacho, fechaEstimada, estado, pedido);
-                    this.enviosService.insertar(envio);
+                    enviosService.insertar(envio);
                 }
-            }
+            } while (fechaEstimada.isBefore(fechaDespacho));
+
         } catch (Exception e) {
-            System.err.println("Error al eliminar envío: " + e.getMessage());
+            System.err.println("Error al crear envío: " + e.getMessage());
 
         }
         return null;
@@ -549,9 +594,9 @@ public class MenuHandler {
             if (p == null) {
                 System.out.println("Persona no encontrada.");
             }
-            else if (p.getEnvio()!= null){
+            else if (p.getEnvio()!=null){                
                 System.out.println("La persona ya tiene un envio asignado");
-            }
+                }
             else{
                 crearEnvio(p);
             }

@@ -137,10 +137,10 @@ public class PedidoDAO implements GenericDAO<Pedido> {
         """;
 
     /**
-     * Query de búsqueda por nombre o apellido con LIKE.
-     * Permite búsqueda flexible: el usuario ingresa "juan" y encuentra "Juan", "Juana", etc.
+     * Query de búsqueda por número de pedido con LIKE.
+     * Permite búsqueda flexible: el usuario ingresa "100" y encuentra "100", "1001", etc.
      * Usa % antes y después del filtro: LIKE '%filtro%'
-     * Solo personas activas (eliminado=FALSE).
+     * Solo pedidos activos (eliminado=FALSE).
      */
     private static final String SEARCH_BY_NUMBER_SQL = """
         SELECT
@@ -191,17 +191,17 @@ public class PedidoDAO implements GenericDAO<Pedido> {
         """;
 
     /**
-     * DAO de envíos (actualmente no usado, pero disponible para operaciones futuras).
+     * DAO de envíos (disponible para operaciones coordinadas).
      * Inyectado en el constructor por si se necesita coordinar operaciones.
      */
     private final EnvioDAO envioDAO;
 
     /**
-     * Constructor con inyección de DomicilioDAO.
+     * Constructor con inyección de EnvioDAO.
      * Valida que la dependencia no sea null (fail-fast).
      *
-     * @param envioDAO DAO de domicilios
-     * @throws IllegalArgumentException si domicilioDAO es null
+     * @param envioDAO DAO de envíos
+     * @throws IllegalArgumentException si envioDAO es null
      */
     public PedidoDAO(EnvioDAO envioDAO) {
         if (envioDAO == null) {
@@ -211,7 +211,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     }
 
     /**
-     * Inserta una persona en la base de datos (versión sin transacción).
+     * Inserta un pedido en la base de datos (versión sin transacción).
      * Crea su propia conexión y la cierra automáticamente.
      *
      * Flujo:
@@ -237,7 +237,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     }
 
     /**
-     * Inserta una persona dentro de una transacción existente.
+     * Inserta un pedido dentro de una transacción existente.
      * NO crea nueva conexión, recibe una Connection externa.
      * NO cierra la conexión (responsabilidad del caller con TransactionManager).
      *
@@ -245,7 +245,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
      * - Operaciones que requieren múltiples inserts coordinados
      * - Rollback automático si alguna operación falla
      *
-     * @param pedido Persona a insertar
+     * @param pedido Pedido a insertar
      * @param conn Conexión transaccional (NO se cierra en este método)
      * @throws Exception Si falla la inserción
      */

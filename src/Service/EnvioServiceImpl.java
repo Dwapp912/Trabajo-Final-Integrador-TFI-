@@ -33,7 +33,7 @@ public class EnvioServiceImpl implements GenericService<Envio> {
      */
     public EnvioServiceImpl(GenericDAO<Envio> envioDAO) {
         if (envioDAO == null) {
-            throw new IllegalArgumentException("DomicilioDAO no puede ser null");
+            throw new IllegalArgumentException("EnvioDAO no puede ser null");
         }
         this.envioDAO = envioDAO;
     }
@@ -99,10 +99,10 @@ public class EnvioServiceImpl implements GenericService<Envio> {
     }
 
     /**
-     * Obtiene un domicilio por su ID.
+     * Obtiene un envío por su ID.
      *
-     * @param id ID del domicilio a buscar
-     * @return Domicilio encontrado, o null si no existe o está eliminado
+     * @param id ID del envío a buscar
+     * @return Envío encontrado, o null si no existe o está eliminado
      * @throws Exception Si id <= 0 o hay error de BD
      */
     @Override
@@ -114,9 +114,9 @@ public class EnvioServiceImpl implements GenericService<Envio> {
     }
 
     /**
-     * Obtiene todos los domicilios activos (eliminado=FALSE).
+     * Obtiene todos los envíos activos (eliminado=FALSE).
      *
-     * @return Lista de domicilios activos (puede estar vacía)
+     * @return Lista de envíos activos (puede estar vacía)
      * @throws Exception Si hay error de BD
      */
     @Override
@@ -125,13 +125,13 @@ public class EnvioServiceImpl implements GenericService<Envio> {
     }
 
     /**
-     * Valida que un domicilio tenga datos correctos.
+     * Valida que un envío tenga datos correctos.
      *
-     * Reglas de negocio aplicadas:
-     * - RN-023: Calle y número son obligatorios
-     * - RN-024: Se verifica trim() para evitar strings solo con espacios
+     * Reglas de negocio aplicadas (simplificadas):
+     * - Tracking obligatorio (no vacío)
+     * - Se verifica trim() para evitar strings solo con espacios
      *
-     * @param envio Domicilio a validar
+     * @param envio Envío a validar
      * @throws IllegalArgumentException Si alguna validación falla
      */
     private void validateEnvio(Envio envio) {

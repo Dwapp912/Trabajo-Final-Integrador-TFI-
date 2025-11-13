@@ -323,7 +323,7 @@ public class EnvioDAO implements GenericDAO<Envio> {
             if (generatedKeys.next()) {
                 envio.setId(generatedKeys.getInt(1));
             } else {
-                throw new SQLException("La inserción del domicilio falló, no se obtuvo ID generado");
+                throw new SQLException("La inserción del envío falló, no se obtuvo ID generado");
             }
         }
     }

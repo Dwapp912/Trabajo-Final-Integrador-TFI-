@@ -10,8 +10,8 @@ import Dao.PedidoDAO;
  * Capa intermedia entre la UI y el DAO que aplica validaciones de negocio complejas.
  *
  * Responsabilidades:
- * - Validar datos de persona ANTES de persistir (RN-035: nombre, apellido, DNI obligatorios)
- * - Garantizar unicidad del DNI en el sistema (RN-001)
+ * - Validar datos de pedido ANTES de persistir (RN-035: número, cliente, total obligatorios)
+ * - Garantizar unicidad del número de pedido en el sistema (RN-001)
  * - COORDINAR operaciones entre Persona y Domicilio (transaccionales)
  * - Proporcionar métodos de búsqueda especializados (por DNI, nombre/apellido)
  * - Implementar eliminación SEGURA de domicilios (evita FKs huérfanas)
@@ -47,7 +47,7 @@ public class PedidosServiceImpl implements GenericService<Pedido> {
             throw new IllegalArgumentException("PedidoDAO no puede ser null");
         }
         if (envioServiceImpl == null) {
-            throw new IllegalArgumentException("DomicilioServiceImpl no puede ser null");
+            throw new IllegalArgumentException("EnvioServiceImpl no puede ser null");
         }
         this.pedidoDAO = pedidoDAO;
         this.envioServiceImpl = envioServiceImpl;

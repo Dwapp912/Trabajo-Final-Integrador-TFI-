@@ -37,8 +37,8 @@ public class Pedido extends Base {
     private String clienteNombre;
 
     /**
-     * DNI de la persona. Requerido, no puede ser null ni vacío.
-     * ÚNICO en el sistema (validado en BD y en PersonaServiceImpl.validateDniUnique()).
+     * Total del pedido. Requerido, no puede ser null.
+     * Validado en PedidosServiceImpl para que no sea menor a cero.
      */
     private Double total;
     /**
@@ -83,8 +83,8 @@ public class Pedido extends Base {
     }
 
     /**
-     * Establece el nombre de la persona.
-     * Validación: PersonaServiceImpl verifica que no esté vacío.
+     * Establece el número del pedido.
+     * Validación: PedidosServiceImpl verifica que no esté vacío.
      */
     public void setNumero(String numero) {
         this.numero = numero;

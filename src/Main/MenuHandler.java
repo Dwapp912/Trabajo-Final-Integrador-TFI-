@@ -16,9 +16,9 @@ import java.time.LocalDate;
  * Responsabilidades:
  * - Capturar entrada del usuario desde consola (Scanner)
  * - Validar entrada básica (conversión de tipos, valores vacíos)
- * - Invocar servicios de negocio (PersonaService, DomicilioService)
+ * - Invocar servicios de negocio (PedidosService, EnvioService)
  * - Mostrar resultados y mensajes de error al usuario
- * - Coordinar operaciones complejas (crear persona con domicilio, etc.)
+ * - Coordinar operaciones complejas (crear pedido con envío, etc.)
  *
  * Patrón: Controller (MVC) - capa de presentación en arquitectura de 4 capas
  * Arquitectura: Main → Service → DAO → Models
@@ -34,7 +34,7 @@ public class MenuHandler {
     private final Scanner scanner;
 
     /**
-     * Servicio de personas para operaciones CRUD.
+     * Servicio de pedidos para operaciones CRUD.
      * También proporciona acceso a DomicilioService mediante getDomicilioService().
      */
     private final PedidosServiceImpl pedidosService;
@@ -45,7 +45,7 @@ public class MenuHandler {
      * Valida que las dependencias no sean null (fail-fast).
      *
      * @param scanner        Scanner compartido para entrada de usuario
-     * @param pedidosService Servicio de personas
+     * @param pedidosService Servicio de pedidos
      * @param enviosService Servicio de envios
      * @throws IllegalArgumentException si alguna dependencia es null
      */
@@ -62,7 +62,7 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 1: Crear nueva persona (con domicilio opcional).
+     * Opción 1: Crear nuevo pedido (con envío opcional).
      *
      * Flujo:
      * 1. Solicita nombre, apellido y DNI
@@ -172,7 +172,7 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 3: Actualizar persona existente.
+     * Opción 3: Actualizar pedido existente.
      *
      * Flujo:
      * 1. Solicita ID de la persona
@@ -226,9 +226,9 @@ public class MenuHandler {
 
             actualizarEnvioDePedido(p);
             pedidosService.actualizar(p);
-            System.out.println("Persona actualizada exitosamente.");
+            System.out.println("Pedido actualizado exitosamente.");
         } catch (Exception e) {
-            System.err.println("Error al actualizar persona: " + e.getMessage());
+            System.err.println("Error al actualizar pedido: " + e.getMessage());
         }
     }
 

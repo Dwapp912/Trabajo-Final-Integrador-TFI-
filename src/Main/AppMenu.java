@@ -137,16 +137,16 @@ public class AppMenu {
      * - Permite bloques con {} para múltiples statements
      *
      * Mapeo de opciones (corresponde a MenuDisplay):
-     * 1  → Crear persona (con domicilio opcional)
-     * 2  → Listar personas (todas o filtradas)
-     * 3  → Actualizar persona
-     * 4  → Eliminar persona (soft delete)
-     * 5  → Crear domicilio independiente
-     * 6  → Listar domicilios
-     * 7  → Actualizar domicilio por ID (afecta a todas las personas que lo comparten)
-     * 8  → Eliminar domicilio por ID (PELIGROSO - puede dejar FKs huérfanas)
-     * 9  → Actualizar domicilio de una persona (afecta a todas las personas que lo comparten)
-     * 10 → Eliminar domicilio de una persona (SEGURO - actualiza FK primero)
+     * 1  → Crear pedido
+     * 2  → Listar pedidos
+     * 3  → Actualizar pedido
+     * 4  → Eliminar pedido (soft delete)
+     * 5  → Crear envío
+     * 6  → Listar envíos
+     * 7  → Actualizar envío por ID
+     * 8  → Eliminar envío por ID
+     * 9  → Actualizar envío por ID de pedido
+     * 10 → Eliminar envío por ID de pedido
      * 0  → Salir (setea running=false para terminar el loop)
      *
      * Opción inválida: Muestra mensaje y continúa el loop.

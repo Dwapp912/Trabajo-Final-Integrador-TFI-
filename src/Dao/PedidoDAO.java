@@ -164,10 +164,10 @@ public class PedidoDAO implements GenericDAO<Pedido> {
         """;
 
     /**
-     * Query de búsqueda exacta por DNI.
-     * Usa comparación exacta (=) porque el DNI es único (RN-001).
-     * Usado por PersonaServiceImpl.validateDniUnique() para verificar unicidad.
-     * Solo personas activas (eliminado=FALSE).
+     * Query de búsqueda exacta por número de pedido.
+     * Usa comparación exacta (=) porque el número es único (RN-001).
+     * Usado por PedidosServiceImpl.validateNumeroUnique() para verificar unicidad.
+     * Solo pedidos activos (eliminado=FALSE).
      */
     private static final String SEARCH_BY_NOMBRE_CLIENTE = """
         SELECT

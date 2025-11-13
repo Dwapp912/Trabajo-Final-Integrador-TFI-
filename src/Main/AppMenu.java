@@ -48,8 +48,8 @@ public class AppMenu {
      *
      * Flujo de inicialización:
      * 1. Crea Scanner único para toda la aplicación
-     * 2. Crea cadena de dependencias (DAOs → Services) mediante createPersonaService()
-     * 3. Crea MenuHandler con Scanner y PersonaService
+     * 2. Crea cadena de dependencias (DAOs → Services)
+     * 3. Crea MenuHandler con Scanner, PedidosService y EnvioService
      * 4. Setea running=true para iniciar el loop
      *
      * Patrón de inyección de dependencias (DI) manual:

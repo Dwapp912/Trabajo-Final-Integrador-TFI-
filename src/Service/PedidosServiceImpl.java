@@ -195,23 +195,23 @@ public class PedidosServiceImpl implements GenericService<Pedido> {
     }
 
     /**
-     * Busca una persona por DNI exacto.
-     * Usa PersonaDAO.buscarPorDni() que realiza búsqueda exacta (=).
+     * Busca un pedido por número exacto.
+     * Usa PedidoDAO.buscarPorNumeroDePedido() que realiza búsqueda exacta (=).
      *
      * Uso típico:
-     * - Validar unicidad del DNI (validateDniUnique)
-     * - Buscar persona específica desde el menú (opción 4)
+     * - Validar unicidad del número de pedido (validateNumeroUnique)
+     * - Buscar pedido específico desde el menú
      *
-     * @param dni DNI exacto a buscar (no puede estar vacío)
-     * @return Persona con ese DNI, o null si no existe o está eliminada
-     * @throws IllegalArgumentException Si el DNI está vacío
+     * @param numeroPedido Número de pedido exacto a buscar (no puede estar vacío)
+     * @return Pedido con ese número, o null si no existe o está eliminado
+     * @throws IllegalArgumentException Si el número de pedido está vacío
      * @throws Exception Si hay error de BD
      */
-    public Pedido buscarPorDni(String dni) throws Exception {
-        if (dni == null || dni.trim().isEmpty()) {
-            throw new IllegalArgumentException("El DNI no puede estar vacío");
+    public Pedido buscarPorNumeroDePedido(String numeroPedido) throws Exception {
+        if (numeroPedido == null || numeroPedido.trim().isEmpty()) {
+            throw new IllegalArgumentException("El número de pedido no puede estar vacío");
         }
-        return pedidoDAO.buscarPorNumeroDePedido(dni);
+        return pedidoDAO.buscarPorNumeroDePedido(numeroPedido);
     }
 
     /**

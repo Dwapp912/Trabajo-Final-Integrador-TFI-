@@ -65,15 +65,11 @@ public class MenuHandler {
      * Opción 1: Crear nuevo pedido (con envío opcional).
      *
      * Flujo:
-     * 1. Solicita nombre, apellido y DNI
-     * 2. Pregunta si desea agregar domicilio
-     * 3. Si sí, captura calle y número
-     * 4. Crea objeto Persona y opcionalmente Domicilio
-     * 5. Invoca personaService.insertar() que:
-     *    - Valida datos (nombre, apellido, DNI obligatorios)
-     *    - Valida DNI único (RN-001)
-     *    - Si hay domicilio, lo inserta primero (obtiene ID)
-     *    - Inserta persona con FK domicilio_id correcta
+     * 1. Solicita número de pedido, fecha, nombre del cliente y total
+     * 2. Pregunta si desea agregar envío
+     * 3. Si sí, captura datos del envío
+     * 4. Crea objeto Pedido y opcionalmente Envío
+     * 5. Invoca pedidosService.insertar() que valida datos y unicidad del número
      *
      * Input trimming: Aplica .trim() a todas las entradas (patrón consistente).
      *
@@ -117,24 +113,22 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 2: Listar personas (todas o filtradas por nombre/apellido).
+     * Opción 2: Listar pedidos (todos o filtrados por nombre de cliente).
      *
      * Submenú:
-     * 1. Listar todas las personas activas (getAll)
-     * 2. Buscar por nombre o apellido con LIKE (buscarPorNombreApellido)
+     * 1. Listar todos los pedidos activos (getAll)
+     * 2. Buscar por nombre de cliente con LIKE
      *
      * Muestra:
-     * - ID, Nombre, Apellido, DNI
-     * - Domicilio (si tiene): Calle Número
+     * - ID, Número, Nombre de Cliente, Total
+     * - Envío (si tiene): Empresa y Tracking
      *
      * Manejo de casos especiales:
-     * - Si no hay personas: Muestra "No se encontraron personas"
-     * - Si la persona no tiene domicilio: Solo muestra datos de persona
+     * - Si no hay pedidos: Muestra "No se encontraron pedidos"
      *
-     * Búsqueda por nombre/apellido:
-     * - Usa PersonaDAO.buscarPorNombreApellido() que hace LIKE '%filtro%'
+     * Búsqueda por nombre de cliente:
+     * - Usa PedidoDAO.buscarPorNombreCliente() que hace LIKE '%filtro%'
      * - Insensible a mayúsculas en MySQL (depende de collation)
-     * - Busca en nombre O apellido
      */
     public void listarPedidos() {
         try {
@@ -208,21 +202,24 @@ public class MenuHandler {
                 return;
             }
 
-            System.out.print("Nuevo nombre (actual: " + p.getNumero() + ", Enter para mantener): ");
-            String nombre = scanner.nextLine().trim();
-            if (!nombre.isEmpty()) {
-                p.setNumero(nombre);
+            System.out.print("Nuevo número de pedido (actual: " + p.getNumero() + ", Enter para mantener): ");
+            String numero = scanner.nextLine().trim();
+            if (!numero.isEmpty()) {
+                p.setNumero(numero);
             }
 
-            System.out.print("Nuevo apellido (actual: " + p.getClienteNombre() + ", Enter para mantener): ");
-            String apellido = scanner.nextLine().trim();
-            if (!apellido.isEmpty()) {
-                p.setClienteNombre(apellido);
+            System.out.print("Nuevo nombre de cliente (actual: " + p.getClienteNombre() + ", Enter para mantener): ");
+            String nombreCliente = scanner.nextLine().trim();
+            if (!nombreCliente.isEmpty()) {
+                p.setClienteNombre(nombreCliente);
             }
 
-            System.out.print("Nuevo DNI (actual: " + p.getTotal() + ", Enter para mantener): ");
-            Double dni = Double.parseDouble(scanner.nextLine().trim());
-            p.setTotal(dni);
+            System.out.print("Nuevo total (actual: " + p.getTotal() + ", Enter para mantener): ");
+            String totalStr = scanner.nextLine().trim();
+            if (!totalStr.isEmpty()) {
+                Double total = Double.parseDouble(totalStr);
+                p.setTotal(total);
+            }
 
             actualizarEnvioDePedido(p);
             pedidosService.actualizar(p);
@@ -255,7 +252,7 @@ public class MenuHandler {
             int id = Integer.parseInt(scanner.nextLine());
             pedidosService.eliminar(id);
         } catch (Exception e) {
-            System.err.println("Error al eliminar persona ingrese un nuumero valido mayor a 0 " + e.getMessage());
+            System.err.println("Error al eliminar pedido, ingrese un número válido mayor a 0. Detalle: " + e.getMessage());
         }
     }
 

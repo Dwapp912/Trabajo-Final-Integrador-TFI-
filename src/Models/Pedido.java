@@ -95,8 +95,8 @@ public class Pedido extends Base {
     }
 
     /**
-     * Establece el apellido de la persona.
-     * Validación: PersonaServiceImpl verifica que no esté vacío.
+     * Establece el nombre del cliente del pedido.
+     * Validación: PedidosServiceImpl verifica que no esté vacío.
      */
     public void setClienteNombre(String clienteNombre) {
         this.clienteNombre = clienteNombre;
@@ -145,9 +145,9 @@ public class Pedido extends Base {
     }
 
     /**
-     * Compara dos pedidos por numero (identificador único).
-     * Dos personas son iguales si tienen el mismo DNI.
-     * Correcto porque DNI es único en el sistema.
+     * Compara dos pedidos por número (identificador único).
+     * Dos pedidos son iguales si tienen el mismo número.
+     * Correcto porque el número de pedido es único en el sistema.
      */
     @Override
     public boolean equals(Object o) {

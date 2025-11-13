@@ -317,42 +317,78 @@ public class MenuHandler {
             if (envio == null) {
                 System.out.println("Envio no encontrado.");
                 return;
+            } else {
+                actualizarEnvioPorId(envio);
             }
+        } catch (Exception e) {
+            System.err.println("Error al actualizar envío: " + e.getMessage());
+        }
+    }
 
-            System.out.print("Nueva empresa (actual: " + envio.getEmpresa() + ", Enter para mantener): ");
-            String empresaString = scanner.nextLine().trim();
-            if (!empresaString.isEmpty()) {
-                Envio.Empresa empresa = Envio.Empresa.valueOf(empresaString);
-                envio.setEmpresa(empresa);
+    public void actualizarEnvioPorId(Envio envio) {
+
+        System.out.print("Nueva empresa (actual: " + envio.getEmpresa() + ", Enter para mantener): ");
+        String empresaString = scanner.nextLine().trim();
+        if (!empresaString.isEmpty()) {
+            Envio.Empresa empresa = Envio.Empresa.valueOf(empresaString);
+            envio.setEmpresa(empresa);
+        } else {
+            envio.setEmpresa(envio.getEmpresa());
+        }
+
+        System.out.print("Nuevo tacking (actual: " + envio.getTracking() + ", Enter para mantener): ");
+        String numero = scanner.nextLine().trim();
+        if (!numero.isEmpty()) {
+            envio.setTracking(numero);
+        } else {
+            envio.setTracking(envio.getTracking());
+        }
+
+        System.out.print("Nuevo Tipo (actual: " + envio.getTipo() + ", Enter para mantener): ");
+        String tipo = scanner.nextLine().trim();
+        if (!tipo.isEmpty()) {
+            envio.setTipo(Envio.Tipo.valueOf(tipo));
+        } else {
+            envio.setTipo(envio.getTipo());
+        }
+
+        System.out.print("Nuevo Estado (actual: " + envio.getEstado() + ", Enter para mantener): ");
+        String estado = scanner.nextLine().trim();
+        if (!estado.isEmpty()) {
+            envio.setEstado(Envio.Estado.valueOf(estado));
+        } else {
+            envio.setEstado(envio.getEstado());
+        }
+
+        System.out.print("Nuevo costo (actual: " + envio.getCosto() + ", Enter para mantener): ");
+        String inputCosto = scanner.nextLine().trim();
+        if (!inputCosto.isEmpty()) {
+            boolean valido = true;
+            while (valido == true) {
+                try {
+                    double costo = Double.parseDouble(inputCosto);
+
+                    if (costo <= 0) {
+                        System.out.println("Ingrese numero mayor a 0");
+                        inputCosto = scanner.nextLine().trim();
+                    } else {
+                        envio.setCosto(costo);
+                        valido = false;
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("Formato de numero no valido " + e.getMessage());
+                    inputCosto = scanner.nextLine().trim();
+                }
             }
+        } else {
+            envio.setCosto(envio.getCosto());
+        }
 
-            System.out.print("Nuevo tacking (actual: " + envio.getTracking() + ", Enter para mantener): ");
-            String numero = scanner.nextLine().trim();
-            if (!numero.isEmpty()) {
-                envio.setTracking(numero);
-            }
-
-            System.out.print("Nuevo Tipo (actual: " + envio.getTipo() + ", Enter para mantener): ");
-            String tipo = scanner.nextLine().trim();
-            if (!tipo.isEmpty()) {
-                envio.setTipo(Envio.Tipo.valueOf(tipo));
-
-            }
-
-            System.out.print("Nuevo Estado (actual: " + envio.getEstado() + ", Enter para mantener): ");
-            String estado = scanner.nextLine().trim();
-            if (!estado.isEmpty()) {
-                envio.setEstado(Envio.Estado.valueOf(estado));
-
-            }
-
-            System.out.print("Nuevo costo (actual: " + envio.getCosto() + ", Enter para mantener): ");
-            double costo = Double.parseDouble(scanner.nextLine());
-            if (costo > 0) {
-                envio.setCosto(costo);
-            }
-
-            System.out.print("Nuevo fecha de despacho (actual: " + envio.getFechaDespacho() + ", Enter para mantener): ");
+        System.out.print("Nuevo fecha de despacho (actual: " + envio.getFechaDespacho() + ", Enter para mantener ingrese cualquier valor para cambiar fecha): ");
+        String opcion = scanner.nextLine().trim();
+        if (opcion.isEmpty()) {
+            envio.setFechaDespacho(envio.getFechaDespacho());
+        } else {
             System.out.print("Ingrese dia (DD) ");
             int dia = Integer.parseInt(scanner.nextLine().trim());
             System.out.print("Ingrese mes: (MM) ");
@@ -360,20 +396,20 @@ public class MenuHandler {
             System.out.print("Ingrese ano: (AAAA) ");
             int ano = Integer.parseInt(scanner.nextLine().trim());
             LocalDate fecha = LocalDate.of(ano, mes, dia);
-
-            if (fecha != null) {
-                envio.setFechaDespacho(fecha);
-                System.out.println(envio.getFechaDespacho());
-            } else {
-
-            }
-
-            pedidosService.getEnvioService().actualizar(envio);
-            System.out.println("Envío actualizado exitosamente.");
-        } catch (Exception e) {
-            System.err.println("Error al actualizar envío: " + e.getMessage());
+            envio.setFechaDespacho(fecha);
         }
+
+        try {
+            pedidosService.getEnvioService().actualizar(envio);
+        } catch (Exception ex) {
+            System.out.println("Error al actualizar pedido " + ex.getMessage());
+        }
+        System.out.println("Envío actualizado exitosamente.");
     }
+
+
+
+
 
     /**
      * Opción 8: Eliminar domicilio por ID (PELIGROSO - soft delete directo).
@@ -399,7 +435,7 @@ public class MenuHandler {
      * - Cuando se está seguro de que el domicilio NO tiene personas asociadas
      * - Limpiar domicilios creados por error
      */
-    public void eliminarDomicilioPorId() {
+    public void eliminarEnvioPorId() {
         try {
             System.out.print("ID del domicilio a eliminar: ");
             int id = Integer.parseInt(scanner.nextLine());
@@ -446,23 +482,11 @@ public class MenuHandler {
                 return;
             }
 
-            Envio d = p.getEnvio();
-            System.out.print("Nueva empresa (" + d.getEmpresa() + "): ");
-            String empresaString = scanner.nextLine().trim();
-            if (!empresaString.isEmpty()) {
-                d.setEmpresa(Envio.Empresa.valueOf(empresaString));
-            }
-
-            System.out.print("Nuevo tracking (" + d.getTracking() + "): ");
-            String tracking = scanner.nextLine().trim();
-            if (!tracking.isEmpty()) {
-                d.setTracking(tracking);
-            }
-
-            pedidosService.getEnvioService().actualizar(d);
-            System.out.println("Domicilio actualizado exitosamente.");
-        } catch (Exception e) {
-            System.err.println("Error al actualizar domicilio: " + e.getMessage());
+            Envio i = p.getEnvio();
+            actualizarEnvioPorId(i);
+        }
+        catch(Exception e) {
+            System.err.println("Error al actualizar envio: " + e.getMessage());
         }
     }
 

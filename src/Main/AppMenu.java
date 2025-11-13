@@ -165,7 +165,7 @@ public class AppMenu {
             case 5 -> menuHandler.crearEnvio();
             case 6 -> menuHandler.listarEnvios();
             case 7 -> menuHandler.actualizarEnvioPorId();
-            case 8 -> menuHandler.eliminarDomicilioPorId();
+            case 8 -> menuHandler.eliminarEnvioPorId();
             case 9 -> menuHandler.actualizarEnvioPorPedido();
             case 10 -> menuHandler.eliminarEnvioDePedido();
             case 0 -> {

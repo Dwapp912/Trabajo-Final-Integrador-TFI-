@@ -194,7 +194,6 @@ public class EnvioDAO implements GenericDAO<Envio> {
             stmt.setInt(7, envio.getId());
 
             int rowsAffected = stmt.executeUpdate();
-            System.out.println(rowsAffected);
             if (rowsAffected == 0) {
                 throw new SQLException("No se pudo actualizar el domicilio con ID: " + envio.getId());
             }

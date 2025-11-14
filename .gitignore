@@ -1,2 +1,4 @@
 out
 .idea
+/nbproject/private/
+/build/

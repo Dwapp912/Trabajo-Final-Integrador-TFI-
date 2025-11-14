@@ -6,7 +6,7 @@ import java.time.LocalDate;
  * Entidad que representa un envio en el sistema.
  * Hereda de Base para obtener id y eliminado.
  *
- * Relación con Persona:
+ * Relación con Pedido:
  * - Un Pedido puede tener 0 o 1 Envíos
  * - Un Envío estará asociado solo a un Pedido (Unidireccional 1->1)
  *
@@ -71,10 +71,10 @@ public class Envio extends Base {
 
 
     /**
-     * Constructor completo para reconstruir un Domicilio desde la base de datos.
-     * Usado por PersonaDAO y DomicilioDAO al mapear ResultSet.
+     * Constructor completo para reconstruir un Envio desde la base de datos.
+     * Usado por PedidoDAO y EnvioDAO al mapear ResultSet.
      *
-     * @param id            ID del domicilio en la BD
+     * @param id            ID del envio en la BD
      * @param eliminado     El registro se encuentra eliminado o no
      * @param tracking      Tracking Number del envío
      * @param empresa       Nombre de la empresa
@@ -99,7 +99,7 @@ public class Envio extends Base {
     }
 
     /**
-     * Constructor por defecto para crear un domicilio nuevo.
+     * Constructor por defecto para crear un envio nuevo.
      * El ID será asignado por la BD al insertar.
      * El flag eliminado se inicializa en false por Base.
      */
@@ -211,11 +211,11 @@ public class Envio extends Base {
 
     /**
      * Compara dos envios por igualdad SEMÁNTICA.
-     * Dos domicilios son iguales si tienen el mismo tracking number y la misma empresa.
+     * Dos envios son iguales si tienen el mismo tracking number y la misma empresa.
      * Nota: NO se compara por ID, permitiendo detectar direcciones duplicadas.
      *
      * @param o Objeto a comparar
-     * @return true si los domicilios tienen la misma calle y número
+     * @return true si los envios tienen la misma calle y número
      */
     @Override
     public boolean equals(Object o) {

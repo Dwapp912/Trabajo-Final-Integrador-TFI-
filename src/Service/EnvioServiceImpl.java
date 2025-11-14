@@ -5,12 +5,12 @@ import Dao.GenericDAO;
 import Models.Envio;
 
 /**
- * Implementación del servicio de negocio para la entidad Domicilio.
+ * Implementación del servicio de negocio para la entidad Envio.
  * Capa intermedia entre la UI y el DAO que aplica validaciones de negocio.
  *
  * Responsabilidades:
- * - Validar que los datos del domicilio sean correctos ANTES de persistir
- * - Aplicar reglas de negocio (RN-023: calle y número obligatorios)
+ * - Validar que los datos del envio sean correctos ANTES de persistir
+ * - Aplicar reglas de negocio (RN-023: tracking, costo, fechaDespacho, fechaEstimada, tipo, empresa, estado y pedidoId obligatorios)
  * - Delegar operaciones de BD al DAO
  * - Transformar excepciones técnicas en errores de negocio comprensibles
  *
@@ -18,7 +18,7 @@ import Models.Envio;
  */
 public class EnvioServiceImpl implements GenericService<Envio> {
     /**
-     * DAO para acceso a datos de domicilios.
+     * DAO para acceso a datos de envio.
      * Inyectado en el constructor (Dependency Injection).
      * Usa GenericDAO para permitir testing con mocks.
      */
@@ -28,25 +28,25 @@ public class EnvioServiceImpl implements GenericService<Envio> {
      * Constructor con inyección de dependencias.
      * Valida que el DAO no sea null (fail-fast).
      *
-     * @param domicilioDAO DAO de domicilios (normalmente DomicilioDAO)
-     * @throws IllegalArgumentException si domicilioDAO es null
+     * @param envioDAO DAO de envio (normalmente EnvioDAO)
+     * @throws IllegalArgumentException si envioDAO es null
      */
     public EnvioServiceImpl(GenericDAO<Envio> domicilioDAO) {
         if (domicilioDAO == null) {
-            throw new IllegalArgumentException("DomicilioDAO no puede ser null");
+            throw new IllegalArgumentException("EnvioDAO no puede ser null");
         }
         this.domicilioDAO = domicilioDAO;
     }
 
     /**
-     * Inserta un nuevo domicilio en la base de datos.
+     * Inserta un nuevo envio en la base de datos.
      *
      * Flujo:
-     * 1. Valida que calle y número no estén vacíos
+     * 1. Valida que tracking, costo, fechaDespacho, fechaEstimada, tipo, empresa, estado y pedidoId no estén vacíos
      * 2. Delega al DAO para insertar
-     * 3. El DAO asigna el ID autogenerado al objeto domicilio
+     * 3. El DAO asigna el ID autogenerado al objeto envio
      *
-     * @param envio Domicilio a insertar (id será ignorado y regenerado)
+     * @param envio Envio a insertar (id será ignorado y regenerado)
      * @throws Exception Si la validación falla o hay error de BD
      */
     @Override
@@ -56,39 +56,39 @@ public class EnvioServiceImpl implements GenericService<Envio> {
     }
 
     /**
-     * Actualiza un domicilio existente en la base de datos.
+     * Actualiza un envio existente en la base de datos.
      *
      * Validaciones:
-     * - El domicilio debe tener datos válidos (calle, número)
-     * - El ID debe ser > 0 (debe ser un domicilio ya persistido)
+     * - El envio debe tener datos válidos (tracking, costo, fechaDespacho, fechaEstimada, tipo, empresa, estado y pedidoId)
+     * - El ID debe ser > 0 (debe ser un envio ya persistido)
      *
-     * IMPORTANTE: Si varias personas comparten este domicilio,
-     * la actualización los afectará a TODAS (RN-040).
+     * IMPORTANTE: Si varios pedidos comparten este envio,
+     * la actualización los afectará a TODOS (RN-040).
      *
-     * @param envio Domicilio con los datos actualizados
-     * @throws Exception Si la validación falla o el domicilio no existe
+     * @param envio Envio con los datos actualizados
+     * @throws Exception Si la validación falla o el envio no existe
      */
     @Override
     public void actualizar(Envio envio) throws Exception {
         validateEnvio(envio);
         if (envio.getId() <= 0) {
-            throw new IllegalArgumentException("El ID del domicilio debe ser mayor a 0 para actualizar");
+            throw new IllegalArgumentException("El ID del envio debe ser mayor a 0 para actualizar");
         }
         domicilioDAO.actualizar(envio);
     }
 
     /**
-     * Elimina lógicamente un domicilio (soft delete).
-     * Marca el domicilio como eliminado=TRUE sin borrarlo físicamente.
+     * Elimina lógicamente un envio (soft delete).
+     * Marca el envio como eliminado=TRUE sin borrarlo físicamente.
      *
-     * ⚠️ ADVERTENCIA: Este método NO verifica si hay personas asociadas.
-     * Puede dejar referencias huérfanas en personas.domicilio_id (RN-029).
+     * ⚠️ ADVERTENCIA: Este método NO verifica si hay pedidos asociados.
+     * Puede dejar referencias huérfanas en pedido.envio_id (RN-029).
      *
-     * ALTERNATIVA SEGURA: Usar PersonaServiceImpl.eliminarDomicilioDePersona()
+     * ALTERNATIVA SEGURA: Usar PedidoServiceImpl.eliminarEnvioDePedido()
      * que actualiza la FK antes de eliminar (opción 10 del menú).
      *
-     * @param id ID del domicilio a eliminar
-     * @throws Exception Si id <= 0 o no existe el domicilio
+     * @param id ID del envio a eliminar
+     * @throws Exception Si id <= 0 o no existe el envio
      */
     @Override
     public void eliminar(int id) throws Exception {
@@ -99,10 +99,10 @@ public class EnvioServiceImpl implements GenericService<Envio> {
     }
 
     /**
-     * Obtiene un domicilio por su ID.
+     * Obtiene un envio por su ID.
      *
-     * @param id ID del domicilio a buscar
-     * @return Domicilio encontrado, o null si no existe o está eliminado
+     * @param id ID del envio a buscar
+     * @return Envio encontrado, o null si no existe o está eliminado
      * @throws Exception Si id <= 0 o hay error de BD
      */
     @Override
@@ -114,9 +114,9 @@ public class EnvioServiceImpl implements GenericService<Envio> {
     }
 
     /**
-     * Obtiene todos los domicilios activos (eliminado=FALSE).
+     * Obtiene todos los envios activos (eliminado=FALSE).
      *
-     * @return Lista de domicilios activos (puede estar vacía)
+     * @return Lista de envios activos (puede estar vacía)
      * @throws Exception Si hay error de BD
      */
     @Override
@@ -125,18 +125,18 @@ public class EnvioServiceImpl implements GenericService<Envio> {
     }
 
     /**
-     * Valida que un domicilio tenga datos correctos.
+     * Valida que un envio tenga datos correctos.
      *
      * Reglas de negocio aplicadas:
-     * - RN-023: Calle y número son obligatorios
+     * - RN-023: tracking, costo, fechaDespacho, fechaEstimada, tipo, empresa, estado y pedidoId son obligatorios
      * - RN-024: Se verifica trim() para evitar strings solo con espacios
      *
-     * @param envio Domicilio a validar
+     * @param envio Envio a validar
      * @throws IllegalArgumentException Si alguna validación falla
      */
     private void validateEnvio(Envio envio) {
         if (envio == null) {
-            throw new IllegalArgumentException("El domicilio no puede ser null");
+            throw new IllegalArgumentException("El envio no puede ser null");
         }
         if (envio.getTracking() == null || envio.getTracking().trim().isEmpty()) {
             throw new IllegalArgumentException("El número no puede estar vacío");

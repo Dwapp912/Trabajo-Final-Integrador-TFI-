@@ -48,16 +48,16 @@ public class AppMenu {
      *
      * Flujo de inicialización:
      * 1. Crea Scanner único para toda la aplicación
-     * 2. Crea cadena de dependencias (DAOs → Services) mediante createPersonaService()
-     * 3. Crea MenuHandler con Scanner y PersonaService
+     * 2. Crea cadena de dependencias (DAOs → Services) mediante createPedidoService()
+     * 3. Crea MenuHandler con Scanner y PedidoService
      * 4. Setea running=true para iniciar el loop
      *
      * Patrón de inyección de dependencias (DI) manual:
-     * - DomicilioDAO (sin dependencias)
-     * - PersonaDAO (depende de DomicilioDAO)
-     * - DomicilioServiceImpl (depende de DomicilioDAO)
-     * - PersonaServiceImpl (depende de PersonaDAO y DomicilioServiceImpl)
-     * - MenuHandler (depende de Scanner y PersonaServiceImpl)
+     * - EnvioDAO (sin dependencias)
+     * - PedidoDAO (depende de EnvioDAO)
+     * - EnvioServiceImpl (depende de EnvioDAO)
+     * - PedidoServiceImpl (depende de PedidoDAO y EnvioServiceImpl)
+     * - MenuHandler (depende de Scanner y PedidoServiceImpl)
      *
      * Esta inicialización garantiza que todas las dependencias estén correctamente conectadas.
      */
@@ -122,8 +122,8 @@ public class AppMenu {
         System.out.println("6. Listar envíos");
         System.out.println("7. Actualizar envío por ID");
         System.out.println("8. Eliminar envío por ID");
-        System.out.println("9. Actualizar envío por ID de persona");
-        System.out.println("10. Eliminar envío por ID de persona");
+        System.out.println("9. Actualizar envío por ID de pedido");
+        System.out.println("10. Eliminar envío por ID de pedido");
         System.out.println("0. Salir");
         System.out.print("Ingrese una opcion: ");
     }
@@ -137,16 +137,16 @@ public class AppMenu {
      * - Permite bloques con {} para múltiples statements
      *
      * Mapeo de opciones (corresponde a MenuDisplay):
-     * 1  → Crear persona (con domicilio opcional)
-     * 2  → Listar personas (todas o filtradas)
-     * 3  → Actualizar persona
-     * 4  → Eliminar persona (soft delete)
-     * 5  → Crear domicilio independiente
-     * 6  → Listar domicilios
-     * 7  → Actualizar domicilio por ID (afecta a todas las personas que lo comparten)
-     * 8  → Eliminar domicilio por ID (PELIGROSO - puede dejar FKs huérfanas)
-     * 9  → Actualizar domicilio de una persona (afecta a todas las personas que lo comparten)
-     * 10 → Eliminar domicilio de una persona (SEGURO - actualiza FK primero)
+     * 1  → Crear pedido (con envio opcional)
+     * 2  → Listar pedidos (todas o filtradas)
+     * 3  → Actualizar pedido
+     * 4  → Eliminar pedido (soft delete)
+     * 5  → Crear envio independiente
+     * 6  → Listar envio
+     * 7  → Actualizar envio por ID (afecta a todos los pedidos que lo comparten)
+     * 8  → Eliminar envio por ID (PELIGROSO - puede dejar FKs huérfanas)
+     * 9  → Actualizar envio de un pedido (afecta a todos los pedidos que lo comparten)
+     * 10 → Eliminar envio de un pedido (SEGURO - actualiza FK primero)
      * 0  → Salir (setea running=false para terminar el loop)
      *
      * Opción inválida: Muestra mensaje y continúa el loop.
@@ -181,31 +181,31 @@ public class AppMenu {
      * Implementa inyección de dependencias manual.
      *
      * Orden de creación (bottom-up desde la capa más baja):
-     * 1. DomicilioDAO: Sin dependencias, acceso directo a BD
-     * 2. PersonaDAO: Depende de DomicilioDAO (inyectado en constructor)
-     * 3. DomicilioServiceImpl: Depende de DomicilioDAO
-     * 4. PersonaServiceImpl: Depende de PersonaDAO y DomicilioServiceImpl
+     * 1. EnvioDAO: Sin dependencias, acceso directo a BD
+     * 2. PedidoDAO: Depende de EnvioDAO (inyectado en constructor)
+     * 3. EnvioServiceImpl: Depende de EnvioDAO
+     * 4. PedidoServiceImpl: Depende de PedidoDAO y EnvioServiceImpl
      *
      * Arquitectura resultante (4 capas):
      * Main (AppMenu, MenuHandler)
      *   ↓
-     * Service (PersonaServiceImpl, DomicilioServiceImpl)
+     * Service (PedidoServiceImpl, EnvioServiceImpl)
      *   ↓
-     * DAO (PersonaDAO, DomicilioDAO)
+     * DAO (PedidoDAO, EnvioDAO)
      *   ↓
-     * Models (Persona, Domicilio, Base)
+     * Models (Pedido, Envio, Base)
      *
-     * ¿Por qué PersonaDAO necesita DomicilioDAO?
+     * ¿Por qué PedidoDAO necesita EnvioDAO?
      * - Actualmente NO lo usa (inyección preparada para futuras operaciones)
      * - Podría usarse para operaciones transaccionales coordinadas
      *
-     * ¿Por qué PersonaService necesita DomicilioService?
-     * - Para insertar/actualizar domicilios al crear/actualizar personas
-     * - Para eliminar domicilios de forma segura (eliminarDomicilioDePersona)
+     * ¿Por qué PedidoService necesita EnvioService?
+     * - Para insertar/actualizar envios al crear/actualizar pedidos
+     * - Para eliminar envios de forma segura (eliminarEnvioDePedido)
      *
      * Patrón: Factory Method para construcción de dependencias
      *
-     * @return PersonaServiceImpl completamente inicializado con todas sus dependencias
+     * @return PedidoServiceImpl completamente inicializado con todas sus dependencias
      */
     private PedidosServiceImpl createPersonaService() {
         EnvioDAO envioDAO = new EnvioDAO();

@@ -10,23 +10,23 @@ import Models.Envio;
 import java.time.LocalDate;
 
 /**
- * Data Access Object para la entidad Persona.
- * Gestiona todas las operaciones de persistencia de personas en la base de datos.
+ * Data Access Object para la entidad Envio.
+ * Gestiona todas las operaciones de persistencia de envio en la base de datos.
  *
  * Características:
- * - Implementa GenericDAO<Persona> para operaciones CRUD estándar
+ * - Implementa GenericDAO<Envio> para operaciones CRUD estándar
  * - Usa PreparedStatements en TODAS las consultas (protección contra SQL injection)
- * - Maneja LEFT JOIN con domicilios para cargar la relación de forma eager
+ * - Maneja LEFT JOIN con envios para cargar la relación de forma eager
  * - Implementa soft delete (eliminado=TRUE, no DELETE físico)
- * - Proporciona búsquedas especializadas (por DNI exacto, por nombre/apellido con LIKE)
+ * - Proporciona búsquedas especializadas (por ID exacto, por clienteNombre con LIKE)
  * - Soporta transacciones mediante insertTx() (recibe Connection externa)
  *
  * Patrón: DAO con try-with-resources para manejo automático de recursos JDBC
  */
 public class PedidoDAO implements GenericDAO<Pedido> {
     /**
-     * Query de inserción de persona.
-     * Inserta nombre, apellido, dni y FK domicilio_id.
+     * Query de inserción de pedido.
+     * Inserta numero, fecha, clienteNombre, total y estado.
      * El id es AUTO_INCREMENT y se obtiene con RETURN_GENERATED_KEYS.
      */
     private static final String INSERT_SQL = """
@@ -43,8 +43,8 @@ public class PedidoDAO implements GenericDAO<Pedido> {
         """;
 
     /**
-     * Query de actualización de persona.
-     * Actualiza nombre, apellido, dni y FK domicilio_id por id.
+     * Query de actualización de pedido.
+     * Actualiza numero, fecha, clienteNombre, total y estado, id.
      * NO actualiza el flag eliminado (solo se modifica en soft delete).
      */
     private static final String UPDATE_SQL = """
@@ -81,13 +81,13 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     """;
 
     /**
-     * Query para obtener persona por ID.
-     * LEFT JOIN con domicilios para cargar la relación de forma eager.
-     * Solo retorna personas activas (eliminado=FALSE).
+     * Query para obtener pedido por ID.
+     * LEFT JOIN con envios para cargar la relación de forma eager.
+     * Solo retorna pedidos activos (eliminado=FALSE).
      *
      * Campos del ResultSet:
-     * - Persona: id, nombre, apellido, dni, domicilio_id
-     * - Domicilio (puede ser NULL): dom_id, calle, numero
+     * - Pedido: eliminado, id, numero, fecha, clienteNombre, estado, total
+     * - Envio (puede ser NULL): envio_id, tracking, empresa, tipo, costo, fechaEstimada, FechaDespacho, estado_envio
      */
     private static final String SELECT_BY_ID_SQL = """
         SELECT
@@ -111,9 +111,9 @@ public class PedidoDAO implements GenericDAO<Pedido> {
         """;
 
     /**
-     * Query para obtener todas las personas activas.
-     * LEFT JOIN con domicilios para cargar relaciones.
-     * Filtra por eliminado=FALSE (solo personas activas).
+     * Query para obtener todas los pedidos activos.
+     * LEFT JOIN con envios para cargar relaciones.
+     * Filtra por eliminado=FALSE (solo pedidos activos).
      */
     private static final String SELECT_ALL_SQL =  """
         SELECT
@@ -137,10 +137,10 @@ public class PedidoDAO implements GenericDAO<Pedido> {
         """;
 
     /**
-     * Query de búsqueda por nombre o apellido con LIKE.
+     * Query de búsqueda por clienteNombre con LIKE.
      * Permite búsqueda flexible: el usuario ingresa "juan" y encuentra "Juan", "Juana", etc.
      * Usa % antes y después del filtro: LIKE '%filtro%'
-     * Solo personas activas (eliminado=FALSE).
+     * Solo pedidos activas (eliminado=FALSE).
      */
     private static final String SEARCH_BY_NUMBER_SQL = """
         SELECT
@@ -164,10 +164,10 @@ public class PedidoDAO implements GenericDAO<Pedido> {
         """;
 
     /**
-     * Query de búsqueda exacta por DNI.
-     * Usa comparación exacta (=) porque el DNI es único (RN-001).
-     * Usado por PersonaServiceImpl.validateDniUnique() para verificar unicidad.
-     * Solo personas activas (eliminado=FALSE).
+     * Query de búsqueda exacta por ID.
+     * Usa comparación exacta (=) porque el ID es único (RN-001).
+     * Usado por PedidoServiceImpl.validateIdUnique() para verificar unicidad.
+     * Solo pedidos activas (eliminado=FALSE).
      */
     private static final String SEARCH_BY_NOMBRE_CLIENTE = """
         SELECT
@@ -191,17 +191,17 @@ public class PedidoDAO implements GenericDAO<Pedido> {
         """;
 
     /**
-     * DAO de domicilios (actualmente no usado, pero disponible para operaciones futuras).
+     * DAO de envios (actualmente no usado, pero disponible para operaciones futuras).
      * Inyectado en el constructor por si se necesita coordinar operaciones.
      */
     private final EnvioDAO envioDAO;
 
     /**
-     * Constructor con inyección de DomicilioDAO.
+     * Constructor con inyección de EnvioDAO.
      * Valida que la dependencia no sea null (fail-fast).
      *
-     * @param envioDAO DAO de domicilios
-     * @throws IllegalArgumentException si domicilioDAO es null
+     * @param envioDAO DAO de envios
+     * @throws IllegalArgumentException si envioDAO es null
      */
     public PedidoDAO(EnvioDAO envioDAO) {
         if (envioDAO == null) {
@@ -211,18 +211,18 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     }
 
     /**
-     * Inserta una persona en la base de datos (versión sin transacción).
+     * Inserta un pedido en la base de datos (versión sin transacción).
      * Crea su propia conexión y la cierra automáticamente.
      *
      * Flujo:
      * 1. Abre conexión con DatabaseConnection.getConnection()
      * 2. Crea PreparedStatement con INSERT_SQL y RETURN_GENERATED_KEYS
-     * 3. Setea parámetros (nombre, apellido, dni, domicilio_id)
+     * 3. Setea parámetros (numero, fecha, clienteNombre, total y estado, id.)
      * 4. Ejecuta INSERT
-     * 5. Obtiene el ID autogenerado y lo asigna a persona.id
+     * 5. Obtiene el ID autogenerado y lo asigna a pedido.id
      * 6. Cierra recursos automáticamente (try-with-resources)
      *
-     * @param pedido Persona a insertar (id será ignorado y regenerado)
+     * @param pedido Pedido a insertar (id será ignorado y regenerado)
      * @throws Exception Si falla la inserción o no se obtiene ID generado
      */
     @Override
@@ -237,7 +237,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     }
 
     /**
-     * Inserta una persona dentro de una transacción existente.
+     * Inserta un pedido dentro de una transacción existente.
      * NO crea nueva conexión, recibe una Connection externa.
      * NO cierra la conexión (responsabilidad del caller con TransactionManager).
      *
@@ -245,7 +245,7 @@ public class PedidoDAO implements GenericDAO<Pedido> {
      * - Operaciones que requieren múltiples inserts coordinados
      * - Rollback automático si alguna operación falla
      *
-     * @param pedido Persona a insertar
+     * @param pedido Pedido a insertar
      * @param conn Conexión transaccional (NO se cierra en este método)
      * @throws Exception Si falla la inserción
      */
@@ -259,18 +259,18 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     }
 
     /**
-     * Actualiza una persona existente en la base de datos.
-     * Actualiza nombre, apellido, dni y FK domicilio_id.
+     * Actualiza un pedido existente en la base de datos.
+     * Actualiza numero, fecha, clienteNombre, total y estado, id.
      *
      * Validaciones:
-     * - Si rowsAffected == 0 → La persona no existe o ya está eliminada
+     * - Si rowsAffected == 0 → El pedido no existe o ya está eliminado
      *
-     * IMPORTANTE: Este método puede cambiar la FK domicilio_id:
-     * - Si persona.domicilio == null → domicilio_id = NULL (desasociar)
-     * - Si persona.domicilio.id > 0 → domicilio_id = domicilio.id (asociar/cambiar)
+     * IMPORTANTE: Este método puede cambiar la FK envio_id:
+     * - Si pedido.envio == null → envio_id = NULL (desasociar)
+     * - Si pedido.envio.id > 0 → envio_id = envio.id (asociar/cambiar)
      *
-     * @param pedido Persona con los datos actualizados (id debe ser > 0)
-     * @throws SQLException Si la persona no existe o hay error de BD
+     * @param pedido Pedido con los datos actualizados (id debe ser > 0)
+     * @throws SQLException Si el pedido no existe o hay error de BD
      */
     @Override
     public void actualizar(Pedido pedido) throws Exception {
@@ -282,23 +282,23 @@ public class PedidoDAO implements GenericDAO<Pedido> {
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
-                throw new SQLException("No se pudo actualizar la persona con ID: " + pedido.getId());
+                throw new SQLException("No se pudo actualizar el pedido con ID: " + pedido.getId());
             }
         }
     }
 
     /**
-     * Elimina lógicamente una persona (soft delete).
+     * Elimina lógicamente un pedido (soft delete).
      * Marca eliminado=TRUE sin borrar físicamente la fila.
      *
      * Validaciones:
-     * - Si rowsAffected == 0 → La persona no existe o ya está eliminada
+     * - Si rowsAffected == 0 → El pedido no existe o ya está eliminada
      *
-     * IMPORTANTE: NO elimina el domicilio asociado (correcto según RN-037).
-     * Múltiples personas pueden compartir un domicilio.
+     * IMPORTANTE: NO elimina el envio asociado (correcto según RN-037).
+     * Múltiples pedidos pueden compartir un envio.
      *
-     * @param id ID de la persona a eliminar
-     * @throws SQLException Si la persona no existe o hay error de BD
+     * @param id ID del pedido a eliminar
+     * @throws SQLException Si el pedido no existe o hay error de BD
      */
     @Override
     public void eliminar(int id) throws Exception {
@@ -317,10 +317,10 @@ public class PedidoDAO implements GenericDAO<Pedido> {
                         int rowsAffected = stmt.executeUpdate();
 
                         if (rowsAffected == 0) {
-                            throw new SQLException("No se encontró persona con ID: " + id);
+                            throw new SQLException("No se encontró pedido con ID: " + id);
                         }
                         else{
-                            System.out.println("Persona eliminada exitosamente.");
+                            System.out.println("Pedido eliminado exitosamente.");
                         }
                     }
                 }
@@ -333,11 +333,11 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     
 
     /**
-     * Obtiene una persona por su ID.
-     * Incluye su domicilio asociado mediante LEFT JOIN.
+     * Obtiene un pedido por su ID.
+     * Incluye su envio asociado mediante LEFT JOIN.
      *
-     * @param id ID de la persona a buscar
-     * @return Persona encontrada con su domicilio, o null si no existe o está eliminada
+     * @param id ID del pedido a buscar
+     * @return Pedido encontrao con su envio, o null si no existe o está eliminada
      * @throws Exception Si hay error de BD (captura SQLException y re-lanza con mensaje descriptivo)
      */
     @Override
@@ -359,12 +359,12 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     }
 
     /**
-     * Obtiene todas las personas activas (eliminado=FALSE).
-     * Incluye sus domicilios mediante LEFT JOIN.
+     * Obtiene todos los pedidos activos (eliminado=FALSE).
+     * Incluye sus envios mediante LEFT JOIN.
      *
      * Nota: Usa Statement (no PreparedStatement) porque no hay parámetros.
      *
-     * @return Lista de personas activas con sus domicilios (puede estar vacía)
+     * @return Lista de pedidos activos con sus envios (puede estar vacía)
      * @throws Exception Si hay error de BD
      */
     @Override
@@ -379,23 +379,23 @@ public class PedidoDAO implements GenericDAO<Pedido> {
                 pedidos.add(mapResultSetToPedido(rs));
             }
         } catch (SQLException e) {
-            throw new Exception("Error al obtener todas las personas: " + e.getMessage(), e);
+            throw new Exception("Error al obtener todos los pedidos: " + e.getMessage(), e);
         }
         return pedidos;
     }
 
     /**
-     * Busca personas por nombre o apellido con búsqueda flexible (LIKE).
+     * Busca pedidos por nombreCliente con búsqueda flexible (LIKE).
      * Permite búsqueda parcial: "juan" encuentra "Juan", "María Juana", etc.
      *
-     * Patrón de búsqueda: LIKE '%filtro%' en nombre O apellido
+     * Patrón de búsqueda: LIKE '%filtro%' en nombreCliente
      * Búsqueda case-sensitive en MySQL (depende de la collation de la BD).
      *
      * Ejemplo:
-     * - filtro = "garcia" → Encuentra personas con nombre o apellido que contengan "garcia"
+     * - filtro = "garcia" → Encuentra pedidos con nombre o apellido que contengan "garcia"
      *
      * @param filtro Texto a buscar (no puede estar vacío)
-     * @return Lista de personas que coinciden con el filtro (puede estar vacía)
+     * @return Lista de pedidos que coinciden con el filtro (puede estar vacía)
      * @throws IllegalArgumentException Si el filtro está vacío
      * @throws SQLException Si hay error de BD
      */
@@ -423,16 +423,16 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     }
 
     /**
-     * Busca una persona por DNI exacto.
-     * Usa comparación exacta (=) porque el DNI es único en el sistema (RN-001).
+     * Busca un pedido por ID exacto.
+     * Usa comparación exacta (=) porque el ID es único en el sistema (RN-001).
      *
      * Uso típico:
-     * - PersonaServiceImpl.validateDniUnique() para verificar que el DNI no esté duplicado
-     * - MenuHandler opción 4 para buscar persona específica por DNI
+     * - PedidoServiceImpl.validateIdUnique() para verificar que el ID no esté duplicado
+     * - MenuHandler opción 4 para buscar pedido específico por ID
      *
-     * @param numeroPedido DNI exacto a buscar (se aplica trim automáticamente)
-     * @return Persona con ese DNI, o null si no existe o está eliminada
-     * @throws IllegalArgumentException Si el DNI está vacío
+     * @param numeroPedido ID exacto a buscar (se aplica trim automáticamente)
+     * @return Pedido con ese ID, o null si no existe o está eliminada
+     * @throws IllegalArgumentException Si el ID está vacío
      * @throws SQLException Si hay error de BD
      */
     public Pedido buscarPorNumeroDePedido(String numeroPedido) throws SQLException {
@@ -455,17 +455,18 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     }
 
     /**
-     * Setea los parámetros de persona en un PreparedStatement.
+     * Setea los parámetros de pedido en un PreparedStatement.
      * Método auxiliar usado por insertar() e insertTx().
      *
      * Parámetros seteados:
-     * 1. nombre (String)
-     * 2. apellido (String)
-     * 3. dni (String)
-     * 4. domicilio_id (Integer o NULL)
+     * 1. numero (String)
+     * 2. fecha (Date)
+     * 3. clienteNombre (String)
+     * 4. total (Double)
+     * 5. estado (String)
      *
      * @param stmt PreparedStatement con INSERT_SQL
-     * @param pedido Persona con los datos a insertar
+     * @param pedido Pedido con los datos a insertar
      * @throws SQLException Si hay error al setear parámetros
      */
     private void setearParametrosPedido(PreparedStatement stmt, Pedido pedido) throws SQLException {
@@ -477,21 +478,21 @@ public class PedidoDAO implements GenericDAO<Pedido> {
     }
 
     /**
-     * Setea la FK domicilio_id en un PreparedStatement.
-     * Maneja correctamente el caso NULL (persona sin domicilio).
+     * Setea la FK envio_id en un PreparedStatement.
+     * Maneja correctamente el caso NULL (pedido sin envio).
      *
      * Lógica:
-     * - Si domicilio != null Y domicilio.id > 0 → Setea el ID
-     * - Si domicilio == null O domicilio.id <= 0 → Setea NULL
+     * - Si envio != null Y envio.id > 0 → Setea el ID
+     * - Si envio == null O envio.id <= 0 → Setea NULL
      *
      * Importante: El tipo Types.INTEGER es necesario para setNull() en JDBC.
      *
      * @param stmt PreparedStatement
      * @param parameterIndex Índice del parámetro (1-based)
-     * @param envio Domicilio asociado (puede ser null)
+     * @param envio Envio asociado (puede ser null)
      * @throws SQLException Si hay error al setear el parámetro
      */
-    private void setDomicilioId(PreparedStatement stmt, int parameterIndex, Envio envio) throws SQLException {
+    private void setEnvioId(PreparedStatement stmt, int parameterIndex, Envio envio) throws SQLException {
         if (envio != null && envio.getId() > 0) {
             stmt.setInt(parameterIndex, envio.getId());
         } else {
@@ -501,15 +502,15 @@ public class PedidoDAO implements GenericDAO<Pedido> {
 
     /**
      * Obtiene el ID autogenerado por la BD después de un INSERT.
-     * Asigna el ID generado al objeto persona.
+     * Asigna el ID generado al objeto pedido.
      *
      * IMPORTANTE: Este método es crítico para mantener la consistencia:
-     * - Después de insertar, el objeto persona debe tener su ID real de la BD
-     * - Permite usar persona.getId() inmediatamente después de insertar
+     * - Después de insertar, el objeto pedido debe tener su ID real de la BD
+     * - Permite usar pedido.getId() inmediatamente después de insertar
      * - Necesario para operaciones transaccionales que requieren el ID generado
      *
      * @param stmt PreparedStatement que ejecutó el INSERT con RETURN_GENERATED_KEYS
-     * @param pedido Objeto persona a actualizar con el ID generado
+     * @param pedido Objeto pedido a actualizar con el ID generado
      * @throws SQLException Si no se pudo obtener el ID generado (indica problema grave)
      */
     private void setGeneratedId(PreparedStatement stmt, Pedido pedido) throws SQLException {
@@ -517,37 +518,45 @@ public class PedidoDAO implements GenericDAO<Pedido> {
             if (generatedKeys.next()) {
                 pedido.setId(generatedKeys.getInt(1));
             } else {
-                throw new SQLException("La inserción de la persona falló, no se obtuvo ID generado");
+                throw new SQLException("La inserción del pedido falló, no se obtuvo ID generado");
             }
         }
     }
 
     /**
-     * Mapea un ResultSet a un objeto Persona.
-     * Reconstruye la relación con Domicilio usando LEFT JOIN.
+     * Mapea un ResultSet a un objeto Pedido.
+     * Reconstruye la relación con Envio usando LEFT JOIN.
      *
      * Mapeo de columnas:
-     * Persona:
+     * Pedido:
      * - id → p.id
-     * - nombre → p.nombre
-     * - apellido → p.apellido
-     * - dni → p.dni
+     * - eliminado → p.eliminado
+     * - numero → p.numero
+     * - fecha → p.fecha
+     * - clienteNombre → p.clienteNombre
+     * - estado → p.estado
+     * - total → p.total
      *
-     * Domicilio (puede ser NULL si la persona no tiene domicilio):
-     * - id → d.id AS dom_id
-     * - calle → d.calle
-     * - numero → d.numero
+     * Envio (puede ser NULL si el pedido no tiene envio):
+     * - id → e.id AS envio_id
+     * - tracking → e.tracking
+     * - empresa → e.empresa
+     * - tipo → e.tipo
+     * - costo → e.costo
+     * - fechaEstimada → e.fechaEstimada
+     * - fechaDespacho → e.fechaDespacho
+     * - estado → e.estado AS estado_envio
      *
      * Lógica de NULL en LEFT JOIN:
-     * - Si domicilio_id es NULL → persona.domicilio = null (correcto)
-     * - Si domicilio_id > 0 → Se crea objeto Domicilio y se asigna a persona
+     * - Si envio_id es NULL → pedido.envio = null (correcto)
+     * - Si envio_id > 0 → Se crea objeto envio y se asigna a pedido
      *
-     * @param rs ResultSet posicionado en una fila con datos de persona y domicilio
-     * @return Persona reconstruida con su domicilio (si tiene)
+     * @param rs ResultSet posicionado en una fila con datos de pedido y envio
+     * @return Pedido reconstruido con su envio (si tiene)
      * @throws SQLException Si hay error al leer columnas del ResultSet
      */
     private Pedido mapResultSetToPedido(ResultSet rs) throws SQLException {
-        // Manejo correcto de LEFT JOIN: verificar si domicilio_id es NULL
+        // Manejo correcto de LEFT JOIN: verificar si envio_id es NULL
         int envioId = rs.getInt("envio_id");
         Envio envio = null;
         if (envioId > 0 && !rs.wasNull()) {

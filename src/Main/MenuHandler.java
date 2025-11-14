@@ -16,9 +16,9 @@ import java.time.LocalDate;
  * Responsabilidades:
  * - Capturar entrada del usuario desde consola (Scanner)
  * - Validar entrada básica (conversión de tipos, valores vacíos)
- * - Invocar servicios de negocio (PersonaService, DomicilioService)
+ * - Invocar servicios de negocio (PedidoService, EnvioService)
  * - Mostrar resultados y mensajes de error al usuario
- * - Coordinar operaciones complejas (crear persona con domicilio, etc.)
+ * - Coordinar operaciones complejas (crear pedido con envio, etc.)
  *
  * Patrón: Controller (MVC) - capa de presentación en arquitectura de 4 capas
  * Arquitectura: Main → Service → DAO → Models
@@ -34,8 +34,8 @@ public class MenuHandler {
     private final Scanner scanner;
 
     /**
-     * Servicio de personas para operaciones CRUD.
-     * También proporciona acceso a DomicilioService mediante getDomicilioService().
+     * Servicio de pedido para operaciones CRUD.
+     * También proporciona acceso a EnvioService mediante getEnvioService().
      */
     private final PedidosServiceImpl pedidosService;
     private final EnvioServiceImpl enviosService;
@@ -45,7 +45,7 @@ public class MenuHandler {
      * Valida que las dependencias no sean null (fail-fast).
      *
      * @param scanner        Scanner compartido para entrada de usuario
-     * @param pedidosService Servicio de personas
+     * @param pedidosService Servicio de pedidos
      * @param enviosService Servicio de envios
      * @throws IllegalArgumentException si alguna dependencia es null
      */
@@ -62,18 +62,18 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 1: Crear nueva persona (con domicilio opcional).
+     * Opción 1: Crear nuevo pedido (con envio opcional).
      *
      * Flujo:
-     * 1. Solicita nombre, apellido y DNI
-     * 2. Pregunta si desea agregar domicilio
+     * 1. Solicita clienteNombre y ID
+     * 2. Pregunta si desea agregar envio
      * 3. Si sí, captura calle y número
-     * 4. Crea objeto Persona y opcionalmente Domicilio
-     * 5. Invoca personaService.insertar() que:
-     *    - Valida datos (nombre, apellido, DNI obligatorios)
-     *    - Valida DNI único (RN-001)
-     *    - Si hay domicilio, lo inserta primero (obtiene ID)
-     *    - Inserta persona con FK domicilio_id correcta
+     * 4. Crea objeto Pedido y opcionalmente Envio
+     * 5. Invoca pedidoService.insertar() que:
+     *    - Valida datos (clienteNombre, ID obligatorios)
+     *    - Valida ID único (RN-001)
+     *    - Si hay envio, lo inserta primero (obtiene ID)
+     *    - Inserta pedido con FK envio_id correcta
      *
      * Input trimming: Aplica .trim() a todas las entradas (patrón consistente).
      *
@@ -117,22 +117,22 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 2: Listar personas (todas o filtradas por nombre/apellido).
+     * Opción 2: Listar pedidos (todos o filtrados por nombre/apellido).
      *
      * Submenú:
-     * 1. Listar todas las personas activas (getAll)
-     * 2. Buscar por nombre o apellido con LIKE (buscarPorNombreApellido)
+     * 1. Listar todos los pedidos actios (getAll)
+     * 2. Buscar por nombre o apellido con LIKE (buscarPorclienteNombre)
      *
      * Muestra:
-     * - ID, Nombre, Apellido, DNI
-     * - Domicilio (si tiene): Calle Número
+     * - ID, Nombre, Apellido
+     * - Envio (si tiene): id
      *
      * Manejo de casos especiales:
-     * - Si no hay personas: Muestra "No se encontraron personas"
-     * - Si la persona no tiene domicilio: Solo muestra datos de persona
+     * - Si no hay pedidos: Muestra "No se encontraron pedidos"
+     * - Si el pedido no tiene envio: Solo muestra datos del pedido
      *
      * Búsqueda por nombre/apellido:
-     * - Usa PersonaDAO.buscarPorNombreApellido() que hace LIKE '%filtro%'
+     * - Usa PedidoDAO.buscarPorclienteNombre() que hace LIKE '%filtro%'
      * - Insensible a mayúsculas en MySQL (depende de collation)
      * - Busca en nombre O apellido
      */
@@ -172,30 +172,30 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 3: Actualizar persona existente.
+     * Opción 3: Actualizar pedido existente.
      *
      * Flujo:
-     * 1. Solicita ID de la persona
-     * 2. Obtiene persona actual de la BD
+     * 1. Solicita ID del pedido
+     * 2. Obtiene pedido actual de la BD
      * 3. Muestra valores actuales y permite actualizar:
      *    - Nombre (Enter para mantener actual)
      *    - Apellido (Enter para mantener actual)
-     *    - DNI (Enter para mantener actual)
-     * 4. Llama a actualizarDomicilioDePersona() para manejar cambios en domicilio
-     * 5. Invoca personaService.actualizar() que valida:
-     *    - Datos obligatorios (nombre, apellido, DNI)
-     *    - DNI único (RN-001), excepto para la misma persona
+     *    - ID (Enter para mantener actual)
+     * 4. Llama a actualizarEnvioDePedido() para manejar cambios en envio
+     * 5. Invoca pedidoService.actualizar() que valida:
+     *    - Datos obligatorios (clienteNombre, ID)
+     *    - ID único (RN-001), excepto para el mismo pedido
      *
      * Patrón "Enter para mantener":
      * - Lee input con scanner.nextLine().trim()
      * - Si isEmpty() → NO actualiza el campo (mantiene valor actual)
      * - Si tiene valor → Actualiza el campo
      *
-     * IMPORTANTE: Esta operación NO actualiza el domicilio directamente.
-     * El domicilio se maneja en actualizarDomicilioDePersona() que puede:
-     * - Actualizar domicilio existente (afecta a TODAS las personas que lo comparten)
-     * - Agregar nuevo domicilio si la persona no tenía
-     * - Dejar domicilio sin cambios
+     * IMPORTANTE: Esta operación NO actualiza el envio directamente.
+     * El envio se maneja en actualizarEnvioDePedido() que puede:
+     * - Actualizar envio existente (afecta a TODOS los pedidos que lo comparten)
+     * - Agregar nuevo envio si el pedido no tenía
+     * - Dejar envio sin cambios
      */
     public void actualizarPedido() {
         try {
@@ -233,21 +233,21 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 4: Eliminar persona (soft delete).
+     * Opción 4: Eliminar pedido (soft delete).
      *
      * Flujo:
-     * 1. Solicita ID de la persona
-     * 2. Invoca personaService.eliminar() que:
-     *    - Marca persona.eliminado = TRUE
-     *    - NO elimina el domicilio asociado (RN-037)
+     * 1. Solicita ID del pedido
+     * 2. Invoca pedidoService.eliminar() que:
+     *    - Marca pedido.eliminado = TRUE
+     *    - NO elimina el envio asociado (RN-037)
      *
-     * IMPORTANTE: El domicilio NO se elimina porque:
-     * - Múltiples personas pueden compartir un domicilio
-     * - Si se eliminara, afectaría a otras personas
+     * IMPORTANTE: El envio NO se elimina porque:
+     * - Múltiples pedidos pueden compartir un envio
+     * - Si se eliminara, afectaría a otros pedidos
      *
-     * Si se quiere eliminar también el domicilio:
-     * - Usar opción 10: "Eliminar domicilio de una persona" (eliminarDomicilioPorPersona)
-     * - Esa opción primero desasocia el domicilio, luego lo elimina (seguro)
+     * Si se quiere eliminar también el envio:
+     * - Usar opción 10: "Eliminar envio de un pedido" (eliminarEnvioPorPedido)
+     * - Esa opción primero desasocia el envio, luego lo elimina (seguro)
      */
     public void eliminarPedido() {
         try {
@@ -260,7 +260,7 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 6: Listar todos los domicilios activos.
+     * Opción 6: Listar todos los envios activos.
      *
      * Muestra: ID, Calle Número
      *
@@ -340,28 +340,28 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 8: Eliminar domicilio por ID (PELIGROSO - soft delete directo).
+     * Opción 8: Eliminar envio por ID (PELIGROSO - soft delete directo).
      *
-     * ⚠️ PELIGRO (RN-029): Este método NO verifica si hay personas asociadas.
-     * Si hay personas con FK a este domicilio, quedarán con referencia huérfana.
+     * ⚠️ PELIGRO (RN-029): Este método NO verifica si hay pedidos asociados.
+     * Si hay pedidos con FK a este envio, quedarán con referencia huérfana.
      *
      * Flujo:
-     * 1. Solicita ID del domicilio
-     * 2. Invoca domicilioService.eliminar() directamente
-     * 3. Marca domicilio.eliminado = TRUE
+     * 1. Solicita ID del envio
+     * 2. Invoca envioService.eliminar() directamente
+     * 3. Marca envio.eliminado = TRUE
      *
      * Problemas potenciales:
-     * - Personas con domicilio_id apuntando a domicilio "eliminado"
+     * - Pedidos con envio_id apuntando a envio "eliminado"
      * - Datos inconsistentes en la BD
      *
-     * ALTERNATIVA SEGURA: Opción 10 (eliminarDomicilioPorPersona)
-     * - Primero desasocia domicilio de la persona (domicilio_id = NULL)
-     * - Luego elimina el domicilio
+     * ALTERNATIVA SEGURA: Opción 10 (eliminarEnvioPorPedido)
+     * - Primero desasocia envio del pedido (envio_id = NULL)
+     * - Luego elimina el envio
      * - Garantiza consistencia
      *
      * Uso válido:
-     * - Cuando se está seguro de que el domicilio NO tiene personas asociadas
-     * - Limpiar domicilios creados por error
+     * - Cuando se está seguro de que el envio NO tiene pedidos asociados
+     * - Limpiar envios creados por error
      */
     public void eliminarDomicilioPorId() {
         try {
@@ -375,24 +375,24 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 7: Actualizar domicilio de una persona específica.
+     * Opción 7: Actualizar envio de un pedido específico.
      *
      * Flujo:
-     * 1. Solicita ID de la persona
-     * 2. Verifica que la persona exista y tenga domicilio
-     * 3. Muestra valores actuales del domicilio
+     * 1. Solicita ID del pedido
+     * 2. Verifica que el pedido exista y tenga envio
+     * 3. Muestra valores actuales del envio
      * 4. Permite actualizar calle y número
-     * 5. Invoca domicilioService.actualizar()
+     * 5. Invoca envioService.actualizar()
      *
-     * ⚠️ IMPORTANTE (RN-040): Esta operación actualiza el domicilio compartido.
-     * Si otras personas tienen el mismo domicilio, también se les actualizará.
+     * ⚠️ IMPORTANTE (RN-040): Esta operación actualiza el envio compartido.
+     * Si otros pedidos tienen el mismo envio, también se les actualizará.
      *
-     * Diferencia con opción 9 (actualizarDomicilioPorId):
-     * - Esta opción: Busca persona primero, luego actualiza su domicilio
-     * - Opción 9: Actualiza domicilio directamente por ID
+     * Diferencia con opción 9 (actualizarEnvioPorId):
+     * - Esta opción: Busca pedido primero, luego actualiza su envio
+     * - Opción 9: Actualiza envio directamente por ID
      *
-     * Ambas tienen el mismo efecto (RN-040): afectan a TODAS las personas
-     * que comparten el domicilio.
+     * Ambas tienen el mismo efecto (RN-040): afectan a TODOS los pedidos
+     * que comparten el envio.
      */
     public void actualizarEnvioPorPedido() {
         try {
@@ -431,22 +431,22 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 10: Eliminar domicilio de una persona (MÉTODO SEGURO - RN-029 solucionado).
+     * Opción 10: Eliminar envio de un pedido (MÉTODO SEGURO - RN-029 solucionado).
      *
      * Flujo transaccional SEGURO:
-     * 1. Solicita ID de la persona
-     * 2. Verifica que la persona exista y tenga domicilio
-     * 3. Invoca personaService.eliminarDomicilioDePersona() que:
-     *    a. Desasocia domicilio de persona (persona.domicilio = null)
-     *    b. Actualiza persona en BD (domicilio_id = NULL)
-     *    c. Elimina el domicilio (ahora no hay FKs apuntando a él)
+     * 1. Solicita ID del pedido
+     * 2. Verifica que el pedido exista y tenga envio
+     * 3. Invoca pedidoService.eliminarEnvioDePedido() que:
+     *    a. Desasocia envio de pedido (pedido.envio = null)
+     *    b. Actualiza pedido en BD (envio_id = NULL)
+     *    c. Elimina el envio (ahora no hay FKs apuntando a él)
      *
-     * Ventaja sobre opción 8 (eliminarDomicilioPorId):
+     * Ventaja sobre opción 8 (eliminarEnvioPorId):
      * - Garantiza consistencia: Primero actualiza FK, luego elimina
      * - NO deja referencias huérfanas
      * - Implementa eliminación segura recomendada en RN-029
      *
-     * Este es el método RECOMENDADO para eliminar domicilios en producción.
+     * Este es el método RECOMENDADO para eliminar envios en producción.
      */
     public void eliminarEnvioDePedido() {
         try {

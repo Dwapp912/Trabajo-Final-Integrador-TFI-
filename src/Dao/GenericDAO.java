@@ -5,7 +5,7 @@ import java.util.List;
 
 public interface GenericDAO<T> {
     // Esta es una interfaz genérica que define métodos comunes para trabajar con cualquier entidad.
-    // Sirve como base para evitar repetir código en distintas clases DAO (como PersonaDAO o DomicilioDAO).
+    // Sirve como base para evitar repetir código en distintas clases DAO (como PedidoDAO o EnvioDAO).
 
     void insertar(T entidad) throws Exception;
     void insertTx(T entidad, Connection conn) throws Exception;

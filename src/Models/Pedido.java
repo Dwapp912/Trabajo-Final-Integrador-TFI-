@@ -6,14 +6,14 @@ import java.util.Objects;
 
 
 /**
- * Entidad que representa una persona en el sistema.
+ * Entidad que representa un pedido en el sistema.
  * Hereda de Base para obtener id y eliminado.
  *
- * Relación con Domicilio:
- * - Una Persona puede tener 0 o 1 Domicilio (relación opcional)
- * - Se relaciona mediante FK domicilio_id en la tabla personas
+ * Relación con Envio:
+ * - Un Pedido puede tener 0 o 1 Envio (relación opcional)
+ * - Se relaciona mediante FK envio_id en la tabla pedido
  *
- * Tabla BD: personas
+ * Tabla BD: pedido
  * Campos:
  * - id: INT AUTO_INCREMENT PRIMARY KEY (heredado de Base)
  * - numero: VARCHAR(20) NOT NULL
@@ -29,15 +29,15 @@ public class Pedido extends Base {
     }
 
     public enum Estado { NUEVO, FACTURADO, ENVIADO }
-    /** Numero de Pediido. Requerido, no puede ser null ni vacío. */
+    /** Numero de Pedido. Requerido, no puede ser null ni vacío. */
     private String numero;
 
     /** Nombre del cliente. Requerido, no puede ser null ni vacío. */
     private String clienteNombre;
 
     /**
-     * DNI de la persona. Requerido, no puede ser null ni vacío.
-     * ÚNICO en el sistema (validado en BD y en PersonaServiceImpl.validateDniUnique()).
+     * ID del pedido. Requerido, no puede ser null ni vacío.
+     * ÚNICO en el sistema (validado en BD y en PedidoServiceImpl.validateIdUnique()).
      */
     private Double total;
     /**
@@ -58,8 +58,8 @@ public class Pedido extends Base {
 
     /**
      * Constructor completo para reconstruir un Pedido desde la BD.
-     * Usado por PersonaDAO al mapear ResultSet.
-     * El domicilio se asigna posteriormente con setDomicilio().
+     * Usado por PedidoDAO al mapear ResultSet.
+     * El envio se asigna posteriormente con setEnvio().
      */
     public Pedido(int id, boolean eliminado, String numero, LocalDate fecha, String clienteNombre,
                   double total, Estado estado, Envio envio) {
@@ -72,7 +72,7 @@ public class Pedido extends Base {
         this.envio = envio;
     }
 
-    /** Constructor por defecto para crear una persona nueva sin ID. */
+    /** Constructor por defecto para crear un pedido nuevo sin ID. */
     public Pedido() {
         super();
     }
@@ -82,8 +82,8 @@ public class Pedido extends Base {
     }
 
     /**
-     * Establece el nombre de la persona.
-     * Validación: PersonaServiceImpl verifica que no esté vacío.
+     * Establece el nombre del pedido.
+     * Validación: PedidoServiceImpl verifica que no esté vacío.
      */
     public void setNumero(String numero) {
         this.numero = numero;
@@ -94,8 +94,8 @@ public class Pedido extends Base {
     }
 
     /**
-     * Establece el apellido de la persona.
-     * Validación: PersonaServiceImpl verifica que no esté vacío.
+     * Establece el nombre del cliente.
+     * Validación: PedidoServiceImpl verifica que no esté vacío.
      */
     public void setClienteNombre(String clienteNombre) {
         this.clienteNombre = clienteNombre;
@@ -107,7 +107,7 @@ public class Pedido extends Base {
 
     /**
      * Establece el total del pedido.
-     * Validación: PersonaServiceImpl verifica que no sea menor a cero.
+     * Validación: PedidoServiceImpl verifica que no sea menor a cero.
      */
     public void setTotal(Double total) {
         this.total = total;
@@ -118,8 +118,8 @@ public class Pedido extends Base {
     }
 
     /**
-     * Asocia o desasocia un domicilio a la persona.
-     * Si domicilio es null, la FK domicilio_id será NULL en la BD.
+     * Asocia o desasocia un envio al pedido.
+     * Si envio es null, la FK envio_id será NULL en la BD.
      */
     public void setEnvio(Envio envio) {
         this.envio = envio;
@@ -145,8 +145,8 @@ public class Pedido extends Base {
 
     /**
      * Compara dos pedidos por numero (identificador único).
-     * Dos personas son iguales si tienen el mismo DNI.
-     * Correcto porque DNI es único en el sistema.
+     * Dos pedidos son iguales si tienen el mismo ID.
+     * Correcto porque ID es único en el sistema.
      */
     @Override
     public boolean equals(Object o) {
@@ -157,8 +157,8 @@ public class Pedido extends Base {
     }
 
     /**
-     * Hash code basado en DNI.
-     * Consistente con equals(): personas con mismo DNI tienen mismo hash.
+     * Hash code basado en ID.
+     * Consistente con equals(): pedidos con mismo ID tienen mismo hash.
      */
     @Override
     public int hashCode() {

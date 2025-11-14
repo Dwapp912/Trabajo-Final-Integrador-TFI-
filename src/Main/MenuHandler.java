@@ -302,25 +302,16 @@ public class MenuHandler {
             if (envio == null) {
                 System.out.println("Envio no encontrado.");
                 return;
-            }else if(envio.isEliminado()){
-                System.out.println("El nevio" +envio+ "\nFigura como eliminado quiere reinsertar el mismo envio con los mismod datos? (s/n)");
-                String subopcion=scanner.nextLine().trim();
-                if (subopcion.equalsIgnoreCase("s")){
-                    envio.setEliminado(false);
-                    pedidosService.getEnvioService().restaurar(id);                    
-                    System.out.println("Envio reinsertado exitosamente");
-                }
-                else{
-                    actualizarEnvioPorId(envio);
-                }
-            } 
-            else {
+            } else if (envio.isEliminado()) {
+                checkEliminado(envio, id);
+            } else {
                 actualizarEnvioPorId(envio);
             }
         } catch (Exception e) {
             System.err.println("Error al actualizar envío: " + e.getMessage());
         }
     }
+
 
     public void actualizarEnvioPorId(Envio envio) {
 
@@ -451,6 +442,23 @@ public class MenuHandler {
      *
      * Nota: Esta opción toma el envío desde el pedido para asegurar que se actualice el correcto.
      */
+
+    public void checkEliminado(Envio envio, int pedidoId) {
+        try {
+            System.out.println("El nevio" + envio + "\nFigura como eliminado quiere reinsertar el mismo envio con los mismos datos? (s/n)");
+            String subopcion = scanner.nextLine().trim();
+            if (subopcion.equalsIgnoreCase("s")) {
+                envio.setEliminado(false);
+                pedidosService.getEnvioService().restaurar(pedidoId);
+                System.out.println("Envio reinsertado exitosamente");
+                ;
+            } else {
+                actualizarEnvioPorId(envio);
+            }
+        } catch (Exception e) {
+            System.err.println("Error al actualizar envio: " + e.getMessage());
+        }
+    }
     public void actualizarEnvioPorPedido() {
         try {
             System.out.print("ID de el pedido cuyo envio desea actualizar: ");
@@ -475,15 +483,14 @@ public class MenuHandler {
                     ;
                 } else {
 
-                    actualizarEnvioPorId(envio);
-                }
-
+                actualizarEnvioPorId(envio);
             }
+
         } catch (Exception e) {
             System.err.println("Error al actualizar envio: " + e.getMessage());
         }
     }
-    
+
             
     /**
      * Opción 10: Eliminar envío por ID de pedido (MÉTODO SEGURO).

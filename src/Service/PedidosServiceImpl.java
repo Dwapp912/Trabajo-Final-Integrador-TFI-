@@ -175,7 +175,7 @@ public class PedidosServiceImpl implements GenericService<Pedido> {
 
     /**
      * Busca pedido por clienteNombre (búsqueda flexible con LIKE).
-     * Usa PedidoDAO.buscarPorclienteNombre() que realiza:
+     * Usa PedidoDAO.buscarPorNombreCliente() que realiza:
      * - LIKE %filtro% en nombre O apellido
      * - Insensible a mayúsculas/minúsculas (LOWER())
      * - Solo pedidos activos (eliminado=FALSE)

@@ -316,15 +316,11 @@ public class PedidoDAO implements GenericDAO<Pedido> {
                     if (rs.getBoolean("eliminado") == true) {
                         System.out.println("El pedido ya ha sido eliminado anteriormente");
                     } else {
-                        int rowsAffected = stmt.executeUpdate();
-
-                        if (rowsAffected == 0) {
-                            throw new SQLException("No se encontró pedido con ID: " + id);
-                        }
-                        else{
-                            System.out.println("Pedido eliminado exitosamente.");
-                        }
+                        stmt.executeUpdate();                       
                     }
+                }
+                else{
+                    System.out.println(("No se encontró pedido con ID: " + id));
                 }
             } catch (SQLException e) {
                 throw new Exception("Error al eliminar pedido: " + e.getMessage(), e);

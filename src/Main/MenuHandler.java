@@ -184,13 +184,8 @@ public class MenuHandler {
     public void actualizarPedido() {
         try {
             System.out.print("ID del pedido a actualizar: ");
-            int id = Integer.parseInt(scanner.nextLine());
-            Pedido p = pedidosService.getById(id);
-
-            if (p == null) {
-                System.out.println("Pedido no encontrado.");
-                return;
-            }
+            Pedido p = obtenerPedidoDesdeScanner();
+            if (p == null) return;
 
             System.out.print("Nuevo número de pedido (actual: " + p.getNumero() + ", Enter para mantener): ");
             String numero = scanner.nextLine().trim();
@@ -217,6 +212,17 @@ public class MenuHandler {
         } catch (Exception e) {
             System.err.println("Error al actualizar pedido: " + e.getMessage());
         }
+    }
+
+    private Pedido obtenerPedidoDesdeScanner() throws Exception {
+        int id = Integer.parseInt(scanner.nextLine());
+        Pedido p = pedidosService.getById(id);
+
+        if (p == null) {
+            System.out.println("Pedido no encontrado.");
+            return null;
+        }
+        return p;
     }
 
     /**
@@ -448,14 +454,11 @@ public class MenuHandler {
     public void actualizarEnvioPorPedido() {
         try {
             System.out.print("ID de el pedido cuyo envio desea actualizar: ");
-            int pedidoId = Integer.parseInt(scanner.nextLine());
-            Pedido p = pedidosService.getById(pedidoId);
-            Envio envio = pedidosService.getEnvioService().getByIdUpdate(pedidoId);
+            Pedido p = obtenerPedidoDesdeScanner();
+            if (p != null) return;
+            Envio envio = pedidosService.getEnvioService().getByIdUpdate(p.getId());
 
-            if (p == null) {
-                System.out.println("Pedido no encontrado.");
-                return;
-            }
+
 
             if (envio == null) {
                 System.out.println("El pedido no tiene envio asociado.");
@@ -467,7 +470,7 @@ public class MenuHandler {
                 String subopcion = scanner.nextLine().trim();
                 if (subopcion.equalsIgnoreCase("s")) {
                     envio.setEliminado(false);
-                    pedidosService.getEnvioService().restaurar(pedidoId);
+                    pedidosService.getEnvioService().restaurar(p.getId());
                     System.out.println("Envio reinsertado exitosamente");
                     ;
                 } else {
@@ -502,13 +505,8 @@ public class MenuHandler {
     public void eliminarEnvioDePedido() {
         try {
             System.out.print("ID de el pedido cuyo envío desea eliminar: ");
-            int pedidoId = Integer.parseInt(scanner.nextLine());
-            Pedido p = pedidosService.getById(pedidoId);
-
-            if (p == null) {
-                System.out.println("Pedido no encontrado.");
-                return;
-            }
+            Pedido p = obtenerPedidoDesdeScanner();
+            if (p == null) return;
 
             if (p.getEnvio() == null) {
                 System.out.println("El pedido no tiene envío asociado.");
@@ -516,7 +514,7 @@ public class MenuHandler {
             }
 
             int envioId = p.getEnvio().getId();
-            pedidosService.eliminarEnvioDePedido(pedidoId, envioId);
+            pedidosService.eliminarEnvioDePedido(p.getId(), envioId);
             System.out.println("Envío eliminado exitosamente y referencia actualizada.");
         } catch (Exception e) {
             System.err.println("Error al eliminar envío: " + e.getMessage());
@@ -588,12 +586,9 @@ public class MenuHandler {
      public void crearEnvio() {
         try {
             System.out.print("ID del pedido a asignar Envio: ");
-            int id = Integer.parseInt(scanner.nextLine());
-            Pedido p = pedidosService.getById(id);
-            if (p == null) {
-                System.out.println("Pedido no encontrado.");
-            }
-            else if (p.getEnvio()!=null){                
+            Pedido p = obtenerPedidoDesdeScanner();
+            if (p == null) return;
+            if (p.getEnvio()!=null){
                 System.out.println("El pedido ya tiene un envío asignado");
                 }
             else{

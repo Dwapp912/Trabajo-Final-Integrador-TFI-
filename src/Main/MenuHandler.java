@@ -84,14 +84,8 @@ public class MenuHandler {
             String numeroPedido = scanner.nextLine().trim();
             System.out.println("Fecha del Pedido: ");
             // TODO: Parsear fecha desde scanner
-
-            System.out.print("Ingrese dia del Pedido: (DD) ");
-            int dia = Integer.parseInt(scanner.nextLine().trim());
-            System.out.print("Ingrese mes: (MM) ");
-            int mes = (Integer.parseInt(scanner.nextLine().trim()));
-            System.out.print("Ingrese ano: (AAAA) ");
-            int ano = Integer.parseInt(scanner.nextLine().trim());
-            LocalDate fecha = LocalDate.of(ano, mes, dia);
+            System.out.println("Ingrese fecha del Pedido:");
+            LocalDate fecha = obtenerFechaDesdeScanner();
             System.out.print("Nombre del Cliente: ");
             String nombreCliente = scanner.nextLine().trim();
             System.out.print("Total del Pedido: ");
@@ -386,13 +380,7 @@ public class MenuHandler {
         if (opcion.isEmpty()) {
             envio.setFechaDespacho(envio.getFechaDespacho());
         } else {
-            System.out.print("Ingrese dia (DD) ");
-            int dia = Integer.parseInt(scanner.nextLine().trim());
-            System.out.print("Ingrese mes: (MM) ");
-            int mes = (Integer.parseInt(scanner.nextLine().trim()));
-            System.out.print("Ingrese ano: (AAAA) ");
-            int ano = Integer.parseInt(scanner.nextLine().trim());
-            LocalDate fecha = LocalDate.of(ano, mes, dia);
+            LocalDate fecha = obtenerFechaDesdeScanner();;
             envio.setFechaDespacho(fecha);
         }
 
@@ -404,8 +392,15 @@ public class MenuHandler {
         System.out.println("Envío actualizado exitosamente.");
     }
 
-
-
+    private LocalDate obtenerFechaDesdeScanner() {
+        System.out.print("Ingrese dia: (DD) ");
+        int dia = Integer.parseInt(scanner.nextLine().trim());
+        System.out.print("Ingrese mes: (MM) ");
+        int mes = (Integer.parseInt(scanner.nextLine().trim()));
+        System.out.print("Ingrese año: (AAAA) ");
+        int ano = Integer.parseInt(scanner.nextLine().trim());
+        return LocalDate.of(ano, mes, dia);
+    }
 
 
     /**
@@ -561,13 +556,7 @@ public class MenuHandler {
 
             do {
                 System.out.println("Ingrese fecha despacho");
-                System.out.print("Ingrese dia (DD)");
-                int dia = Integer.parseInt(scanner.nextLine().trim());
-                System.out.print("Ingrese mes: (MM)");
-                int mes = (Integer.parseInt(scanner.nextLine().trim()));
-                System.out.print("Ingrese ano: (AAAA) ");
-                int ano = Integer.parseInt(scanner.nextLine().trim());
-                fechaDespacho = LocalDate.of(ano, mes, dia);
+                fechaDespacho = obtenerFechaDesdeScanner();
                 if (fechaDespacho.isBefore(pedido.getFecha())){
                     System.out.println("La fecha de despacho no puede ser anterior a la del pedido");
                 }
@@ -579,13 +568,7 @@ public class MenuHandler {
 
             do {
                 System.out.println("Ingrese fecha estimada de llegada");
-                System.out.print("Ingrese dia (DD)");
-                int diaE = Integer.parseInt(scanner.nextLine().trim());
-                System.out.print("Ingrese mes: (MM)");
-                int mesE = (Integer.parseInt(scanner.nextLine().trim()));
-                System.out.print("Ingrese ano: (AAAA) ");
-                int anoE = Integer.parseInt(scanner.nextLine().trim());
-                fechaEstimada = LocalDate.of(anoE, mesE, diaE);
+                fechaEstimada = obtenerFechaDesdeScanner();
 
                 if (fechaEstimada.isBefore(fechaDespacho)) {
                     System.out.println("la Fecha Estimada de llegada no puede ser menor a la de despacho");

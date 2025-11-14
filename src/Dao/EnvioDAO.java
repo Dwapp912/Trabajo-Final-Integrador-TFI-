@@ -266,10 +266,14 @@ public class EnvioDAO implements GenericDAO<Envio> {
      */
     @Override
     public Envio getById(int id) throws SQLException {
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SELECT_BY_ID_SQL)) {
+        return getEnvio(id, SELECT_BY_ID_SQL);
+    }
 
-            stmt.setInt(1, id);
+    private Envio getEnvio(int idEnvio, String selectByIdSql) throws SQLException {
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(selectByIdSql)) {
+
+            stmt.setInt(1, idEnvio);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -279,20 +283,9 @@ public class EnvioDAO implements GenericDAO<Envio> {
         }
         return null;
     }
-    
+
     public Envio getByIdUpdate(int id) throws SQLException {
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(SELECT_BY_ID_SQL_UPDATE)) {
-
-            stmt.setInt(1, id);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return mapResultSetToEnvio(rs);
-                }
-            }
-        }
-        return null;
+        return getEnvio(id, SELECT_BY_ID_SQL_UPDATE);
     }
     /**
      * Obtiene todos los envíos activos (eliminado=FALSE).

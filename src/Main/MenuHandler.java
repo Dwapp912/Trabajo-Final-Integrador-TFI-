@@ -459,14 +459,13 @@ public class MenuHandler {
             System.err.println("Error al actualizar envio: " + e.getMessage());
         }
     }
-    public void actualizarEnvioPorPedido() {
+
+    public void actualizarEnvioPorPedido() throws Exception {
         try {
             System.out.print("ID de el pedido cuyo envio desea actualizar: ");
             Pedido p = obtenerPedidoDesdeScanner();
-            if (p != null) return;
+            if (p == null) return;
             Envio envio = pedidosService.getEnvioService().getByIdUpdate(p.getId());
-
-
 
             if (envio == null) {
                 System.out.println("El pedido no tiene envio asociado.");
@@ -483,7 +482,8 @@ public class MenuHandler {
                     ;
                 } else {
 
-                actualizarEnvioPorId(envio);
+                    actualizarEnvioPorId(envio);
+                }
             }
 
         } catch (Exception e) {

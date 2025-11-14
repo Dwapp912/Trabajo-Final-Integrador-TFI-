@@ -465,7 +465,7 @@ public class MenuHandler {
             System.out.print("ID de el pedido cuyo envio desea actualizar: ");
             Pedido p = obtenerPedidoDesdeScanner();
             if (p == null) return;
-            Envio envio = pedidosService.getEnvioService().getByIdUpdate(p.getId());
+            Envio envio = pedidosService.getEnvioService().getByIdUpdate(p.getEnvio().getId());
 
             if (envio == null) {
                 System.out.println("El pedido no tiene envio asociado.");

@@ -83,7 +83,6 @@ public class MenuHandler {
         try {
             System.out.print("Número de Tracking: ");
             String numeroPedido = scanner.nextLine().trim();
-            System.out.println("Fecha del Pedido: ");
             // TODO: Parsear fecha desde scanner
             System.out.println("Ingrese fecha del Pedido:");
             LocalDate fecha = obtenerFechaDesdeScanner();

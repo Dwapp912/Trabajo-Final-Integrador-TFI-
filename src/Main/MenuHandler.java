@@ -269,7 +269,7 @@ public class MenuHandler {
                 return;
             }
             for (Envio d : envios) {
-                System.out.println("ID ded envio : " + d.getId() + " Empresa de envio: " + d.getEmpresa() + " Numero de tracking : " + d.getTracking());
+                System.out.println("ID envio : " + d.getId() + " Empresa de envio: " + d.getEmpresa() + " Numero de tracking : " + d.getTracking());
             }
         } catch (Exception e) {
             System.err.println("Error al listar envíos: " + e.getMessage());

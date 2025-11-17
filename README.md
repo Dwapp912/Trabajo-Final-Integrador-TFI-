@@ -11,6 +11,9 @@ transaccionales (commit/rollback) y menú de consola para CRUD.
 
 ## Integrantes:
 **Nahuel Urciuoli Zabala**  - Comision 9
+**Maximo Emanuel Ponce**  - Comision 4
+**Luciano Joaquin Martinez**  - Comision 4
+**Santiago Gabriel Rodriguez**  - Comision 4
 
 ## Descripción del proyecto
 Este repositorio contiene los archivos referidos al trabajo final de Programacion II

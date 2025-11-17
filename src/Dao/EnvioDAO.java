@@ -151,7 +151,7 @@ public class EnvioDAO implements GenericDAO<Envio> {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             setearParametrosEnvio(stmt, envio);
-            stmt.setInt(7, envio.getPedidoId());
+            stmt.setInt(8, envio.getPedidoId());
             stmt.executeUpdate();
             setGeneratedId(stmt, envio);
         }
@@ -197,7 +197,7 @@ public class EnvioDAO implements GenericDAO<Envio> {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(UPDATE_SQL)) {
             setearParametrosEnvio(stmt, envio);
-            stmt.setInt(7, envio.getId());
+            stmt.setInt(8, envio.getId());
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected == 0) {
@@ -337,10 +337,10 @@ public class EnvioDAO implements GenericDAO<Envio> {
         stmt.setString(1, envio.getTracking());
         stmt.setDouble(2, envio.getCosto());
         stmt.setDate(3, java.sql.Date.valueOf(envio.getFechaDespacho()));
-        stmt.setDate(3, java.sql.Date.valueOf(envio.getFechaEstimada()));
-        stmt.setString(3, envio.getTipo().toString());
-        stmt.setString(2, envio.getEmpresa().toString());
-        stmt.setString(4, envio.getEstado().toString());
+        stmt.setDate(4, java.sql.Date.valueOf(envio.getFechaEstimada()));
+        stmt.setString(5, envio.getTipo().toString());
+        stmt.setString(6, envio.getEmpresa().toString());
+        stmt.setString(7, envio.getEstado().toString());
 
 
     }

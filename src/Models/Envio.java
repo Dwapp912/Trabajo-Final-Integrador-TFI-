@@ -17,7 +17,7 @@ import java.time.LocalDate;
  * - costo: DECIMAL(12, 2) NOT NULL
  * - fechaDespacho: DATE NOT NULL
  * - fechaEstimada: DATE NULL
- * - tipo ENUM('ESTANDAR','EXPRESS') NOT NULL
+ * - tipo ENUM('ESTANDAR','EXPRES') NOT NULL
  * - empresa ENUM('ANDREANI','OCA','CORREO_ARG') NOT NULL
  * - estado ENUM('EN_PREPARACION','EN_TRANSITO','ENTREGADO') NOT NULL
  * - pedidoId: INT NULL (FK a pedido.id)
@@ -27,7 +27,7 @@ public class Envio extends Base {
     private Pedido pedido;
 
     public enum Empresa { ANDREANI, OCA, CORREO_ARG }
-    public enum Tipo { ESTANDAR, EXPRESS }
+    public enum Tipo { ESTANDAR, EXPRES }
     public enum Estado { EN_PREPARACION, EN_TRANSITO, ENTREGADO }
 
     /**

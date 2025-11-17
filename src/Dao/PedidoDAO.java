@@ -106,8 +106,8 @@ public class PedidoDAO implements GenericDAO<Pedido> {
             e.fechaEstimada,
             e.fechaDespacho,
             e.estado as estado_envio
-            FROM pedido p LEFT JOIN envio e ON e.pedidoId = p.id 
-            WHERE p.id = ? AND p.eliminado = FALSE;
+            FROM pedido p LEFT JOIN envio e ON e.pedidoId = p.id  AND NOT e.eliminado
+            WHERE p.id = ? AND NOT p.eliminado;
         """;
 
 

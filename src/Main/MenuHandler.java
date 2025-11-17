@@ -533,38 +533,18 @@ public class MenuHandler {
         try {
             System.out.print("Tracking: ");
             String tracking = scanner.nextLine().trim();
-            Envio.Empresa empresa = obtenerEmpresaDesdeScanner(null);
-            Envio.Tipo tipo = obtenerTipoDesdeScanner(null);
-            Envio.Estado estado = obtenerEstadoDesdeScanner(null);
+            Envio.Empresa empresa = obtenerEmpresaDesdeScanner(Envio.Empresa.OCA);
+            Envio.Tipo tipo = obtenerTipoDesdeScanner(Envio.Tipo.EXPRES);
+            Envio.Estado estado = obtenerEstadoDesdeScanner(Envio.Estado.EN_PREPARACION);
 
             System.out.print("Costo Envio: ");
             Double costo = Double.parseDouble(scanner.nextLine());
 
-            LocalDate fechaDespacho = null;
+            LocalDate fechaDespacho = obtenerFechaPosteriorA(pedido.getFecha(), "despacho", "pedido");
+            LocalDate fechaEstimada = obtenerFechaPosteriorA(fechaDespacho, "llegada", "despacho");
 
-            do {
-                System.out.println("Ingrese fecha despacho");
-                fechaDespacho = obtenerFechaDesdeScanner();
-                if (fechaDespacho.isBefore(pedido.getFecha())){
-                    System.out.println("La fecha de despacho no puede ser anterior a la del pedido");
-                }
-            } while (fechaDespacho.isBefore(pedido.getFecha()));
-            {
-
-            }
-            LocalDate fechaEstimada = null;
-
-            do {
-                System.out.println("Ingrese fecha estimada de llegada");
-                fechaEstimada = obtenerFechaDesdeScanner();
-
-                if (fechaEstimada.isBefore(fechaDespacho)) {
-                    System.out.println("la Fecha Estimada de llegada no puede ser menor a la de despacho");
-                } else {
-                    Envio envio = new Envio(0, false, tracking, empresa, tipo, costo, fechaDespacho, fechaEstimada, estado, pedido);
-                    enviosService.insertar(envio);
-                }
-            } while (fechaEstimada.isBefore(fechaDespacho));
+            Envio envio = new Envio(0, false, tracking, empresa, tipo, costo, fechaDespacho, fechaEstimada, estado, pedido);
+            enviosService.insertar(envio);
 
         } catch (Exception e) {
             System.err.println("Error al crear envío: " + e.getMessage());
@@ -573,9 +553,21 @@ public class MenuHandler {
         return null;
     }
 
+    private LocalDate obtenerFechaPosteriorA(LocalDate fechaAnterior, String nombreFechaAObtener, String nombreFechaAnterior) {
+        LocalDate fechaDespacho = null;
+        do {
+            System.out.println("Ingrese fecha " + nombreFechaAObtener);
+            fechaDespacho = obtenerFechaDesdeScanner();
+            if (fechaDespacho.isBefore(fechaAnterior)){
+                System.out.println("La fecha de no puede ser anterior a la fecha de " + nombreFechaAnterior);
+            }
+        } while (fechaDespacho.isBefore(fechaAnterior));
+        return fechaDespacho;
+    }
+
     private Envio.Estado obtenerEstadoDesdeScanner(Envio.Estado estadoActual) {
         if (estadoActual != null) {
-            System.out.print("Actual: " + estadoActual + " (Enter para mantener). ");
+            System.out.print("Actual/Default: " + estadoActual + " (Enter para mantener). ");
         }
         System.out.print("OPCIONES: (1: EN PREPARACION, 2: EN_TRANSITO, 3: ENTREGADO): ");
         Envio.Estado estado = Map.of(
@@ -587,18 +579,18 @@ public class MenuHandler {
 
     private Envio.Tipo obtenerTipoDesdeScanner(Envio.Tipo tipoActual) {
         if (tipoActual != null) {
-            System.out.print("Actual: " + tipoActual + " (Enter para mantener). ");
+            System.out.print("Actual/Default: " + tipoActual + " (Enter para mantener). ");
         }
-        System.out.print("OPCIONES: (1: ESTÁNDAR, 2: EXPRESS): ");
+        System.out.print("OPCIONES: (1: ESTÁNDAR, 2: EXPRES): ");
         Envio.Tipo tipo = Map.of(
                 "1", Envio.Tipo.ESTANDAR,
-                "2", Envio.Tipo.EXPRESS).getOrDefault(scanner.nextLine().trim(),  tipoActual);
+                "2", Envio.Tipo.EXPRES).getOrDefault(scanner.nextLine().trim(),  tipoActual);
         return tipo;
     }
 
     private Envio.Empresa obtenerEmpresaDesdeScanner(Envio.Empresa empresaActual) {
         if (empresaActual != null) {
-            System.out.print("Actual: " + empresaActual + " (Enter para mantener). ");
+            System.out.print("Actual/Default: " + empresaActual + " (Enter para mantener). ");
         }
         System.out.print("OPCIONES: (1: CORREO ARG, 2: ANDREANI, 3: OCA): ");
         Envio.Empresa empresa =Map.of(

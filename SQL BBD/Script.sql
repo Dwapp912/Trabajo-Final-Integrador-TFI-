@@ -105,7 +105,7 @@ ALTER TABLE `pedido`
 -- Filtros para la tabla `envio`
 --
 ALTER TABLE `envio`
-  ADD CONSTRAINT `pedidoId` FOREIGN KEY (`id`) REFERENCES `pedido` (`id`) ON UPDATE CASCADE;
+  ADD CONSTRAINT `pedidoId` FOREIGN KEY (`pedidoId`) REFERENCES `pedido` (`id`) ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

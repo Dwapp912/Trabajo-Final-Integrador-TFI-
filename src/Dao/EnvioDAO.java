@@ -61,12 +61,12 @@ public class EnvioDAO implements GenericDAO<Envio> {
             envio
         SET
            tracking = ?,
-           empresa = ?,  
-           tipo = ?, 
-           estado = ? , 
            costo = ?,
-           fechaDespacho = ?                                  
-                                                                                     
+           fechaDespacho = ?,
+           fechaEstimada = ?,
+           tipo = ?,
+           empresa = ?,
+           estado = ?                                                             
         WHERE id = ?
     """;
 
@@ -151,6 +151,7 @@ public class EnvioDAO implements GenericDAO<Envio> {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             setearParametrosEnvio(stmt, envio);
+            stmt.setInt(7, envio.getPedidoId());
             stmt.executeUpdate();
             setGeneratedId(stmt, envio);
         }
@@ -334,8 +335,9 @@ public class EnvioDAO implements GenericDAO<Envio> {
      */
     private void setearParametrosEnvio(PreparedStatement stmt, Envio envio) throws SQLException {
         stmt.setString(1, envio.getTracking());
-        stmt.setDouble(5, envio.getCosto());
-        stmt.setDate(6, java.sql.Date.valueOf(envio.getFechaDespacho()));
+        stmt.setDouble(2, envio.getCosto());
+        stmt.setDate(3, java.sql.Date.valueOf(envio.getFechaDespacho()));
+        stmt.setDate(3, java.sql.Date.valueOf(envio.getFechaEstimada()));
         stmt.setString(3, envio.getTipo().toString());
         stmt.setString(2, envio.getEmpresa().toString());
         stmt.setString(4, envio.getEstado().toString());

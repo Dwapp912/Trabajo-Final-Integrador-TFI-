@@ -111,8 +111,8 @@ public class MenuHandler {
      * Opción 2: Listar pedidos (todos o filtrados por nombre de cliente).
      *
      * Submenú:
-     * 1. Listar todos los pedidos actios (getAll)
-     * 2. Buscar por nombre o apellido con LIKE (buscarPorclienteNombre)
+     * 1. Listar todos los pedidos activos (getAll)
+     * 2. Buscar por nombre o apellido con LIKE (buscarPorNombreCliente)
      *
      * Muestra:
      * - ID, Nombre, Apellido
@@ -434,13 +434,13 @@ public class MenuHandler {
     }
 
     /**
-     * Opción 7: Actualizar envio de un pedido específico.
+     * Opción 9: Actualizar envio de un pedido específico.
      *
      * Flujo:
      * 1. Solicita ID del pedido
-     * 2. Verifica que el pedido exista y tenga envio
-     * 3. Muestra valores actuales del envio
-     * 4. Permite actualizar calle y número
+     * 2. Verifica que el pedido exista y tenga envío asociado
+     * 3. Muestra valores actuales del envío
+     * 4. Permite actualizar campos del envío (empresa, tracking, tipo, estado, costo, fecha)
      * 5. Invoca envioService.actualizar()
      *
      * Nota: Esta opción toma el envío desde el pedido para asegurar que se actualice el correcto.

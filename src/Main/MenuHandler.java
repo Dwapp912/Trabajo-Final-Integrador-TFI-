@@ -3,6 +3,7 @@ package Main;
 import Models.Pedido;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import Models.Envio;
 import Service.EnvioServiceImpl;
@@ -550,10 +551,15 @@ public class MenuHandler {
         try {
             System.out.print("Tracking: ");
             String tracking = scanner.nextLine().trim();
-            System.out.print("Empresa: ");
-            Envio.Empresa empresa = Envio.Empresa.valueOf(scanner.nextLine().trim());
-            System.out.print("Tipo Envio: ");
-            Envio.Tipo tipo = Envio.Tipo.valueOf(scanner.nextLine().trim());
+            System.out.print("Empresa (1: CORREO ARG, 2: ANDREANI, 3: OCA): ");
+            Envio.Empresa empresa =Map.of(
+                    "1", Envio.Empresa.CORREO_ARG,
+                    "2", Envio.Empresa.ANDREANI,
+                    "3", Envio.Empresa.OCA).get(scanner.nextLine().trim());
+            System.out.print("Tipo Envio (1: ESTÁNDAR, 2: EXPRESS): ");
+            Envio.Tipo tipo = Map.of(
+                    "1", Envio.Tipo.ESTANDAR,
+                    "2", Envio.Tipo.EXPRESS).get(scanner.nextLine().trim());
             System.out.print("Estado Envio: ");
             Envio.Estado estado = Envio.Estado.valueOf(scanner.nextLine().trim());
             System.out.print("Costo Envio: ");

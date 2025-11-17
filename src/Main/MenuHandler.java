@@ -83,7 +83,6 @@ public class MenuHandler {
         try {
             System.out.print("Número de Tracking: ");
             String numeroPedido = scanner.nextLine().trim();
-            System.out.println("Fecha del Pedido: ");
             // TODO: Parsear fecha desde scanner
             System.out.println("Ingrese fecha del Pedido:");
             LocalDate fecha = obtenerFechaDesdeScanner();
@@ -562,7 +561,7 @@ public class MenuHandler {
                     "1", Envio.Tipo.ESTANDAR,
                     "2", Envio.Tipo.EXPRESS).get(scanner.nextLine().trim());
 
-            System.out.print("Estado Envio (1: EN PREPARACION, 2: EN_TRANSITO, 3ENTREGADO): ");
+            System.out.print("Estado Envio (1: EN PREPARACION, 2: EN_TRANSITO, 3: ENTREGADO): ");
             Envio.Estado estado = Map.of(
                     "1", Envio.Estado.EN_PREPARACION,
                     "2", Envio.Estado.EN_TRANSITO,

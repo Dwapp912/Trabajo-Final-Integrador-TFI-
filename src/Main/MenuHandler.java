@@ -550,22 +550,9 @@ public class MenuHandler {
         try {
             System.out.print("Tracking: ");
             String tracking = scanner.nextLine().trim();
-            System.out.print("Empresa (1: CORREO ARG, 2: ANDREANI, 3: OCA): ");
-            Envio.Empresa empresa =Map.of(
-                    "1", Envio.Empresa.CORREO_ARG,
-                    "2", Envio.Empresa.ANDREANI,
-                    "3", Envio.Empresa.OCA).get(scanner.nextLine().trim());
-            System.out.print("Tipo Envio (1: ESTÁNDAR, 2: EXPRESS): ");
-
-            Envio.Tipo tipo = Map.of(
-                    "1", Envio.Tipo.ESTANDAR,
-                    "2", Envio.Tipo.EXPRESS).get(scanner.nextLine().trim());
-
-            System.out.print("Estado Envio (1: EN PREPARACION, 2: EN_TRANSITO, 3: ENTREGADO): ");
-            Envio.Estado estado = Map.of(
-                    "1", Envio.Estado.EN_PREPARACION,
-                    "2", Envio.Estado.EN_TRANSITO,
-                    "3", Envio.Estado.ENTREGADO).get(scanner.nextLine().trim());
+            Envio.Empresa empresa = obtenerEmpresaDesdeScanner();
+            Envio.Tipo tipo = obtenerTipoDesdeScanner();
+            Envio.Estado estado = obtenerEstadoDesdeScanner();
 
             System.out.print("Costo Envio: ");
             Double costo = Double.parseDouble(scanner.nextLine());
@@ -603,7 +590,34 @@ public class MenuHandler {
         return null;
     }
 
-     public void crearEnvio() {
+    private Envio.Estado obtenerEstadoDesdeScanner() {
+        System.out.print("Estado Envio (1: EN PREPARACION, 2: EN_TRANSITO, 3: ENTREGADO): ");
+        Envio.Estado estado = Map.of(
+                "1", Envio.Estado.EN_PREPARACION,
+                "2", Envio.Estado.EN_TRANSITO,
+                "3", Envio.Estado.ENTREGADO).get(scanner.nextLine().trim());
+        return estado;
+    }
+
+    private Envio.Tipo obtenerTipoDesdeScanner() {
+        System.out.print("Tipo Envio (1: ESTÁNDAR, 2: EXPRESS): ");
+
+        Envio.Tipo tipo = Map.of(
+                "1", Envio.Tipo.ESTANDAR,
+                "2", Envio.Tipo.EXPRESS).get(scanner.nextLine().trim());
+        return tipo;
+    }
+
+    private Envio.Empresa obtenerEmpresaDesdeScanner() {
+        System.out.print("Empresa (1: CORREO ARG, 2: ANDREANI, 3: OCA): ");
+        Envio.Empresa empresa =Map.of(
+                "1", Envio.Empresa.CORREO_ARG,
+                "2", Envio.Empresa.ANDREANI,
+                "3", Envio.Empresa.OCA).get(scanner.nextLine().trim());
+        return empresa;
+    }
+
+    public void crearEnvio() {
         try {
             System.out.print("ID del pedido a asignar Envio: ");
             Pedido p = obtenerPedidoDesdeScanner();
@@ -646,6 +660,7 @@ public class MenuHandler {
                 System.out.print("Nueva empresa (" + p.getEnvio().getEmpresa() + "): ");
                 String empresaString = scanner.nextLine().trim();
                 if (!empresaString.isEmpty()) {
+
                     p.getEnvio().setEmpresa(Envio.Empresa.valueOf(empresaString));
                 }
 

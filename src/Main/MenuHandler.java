@@ -283,10 +283,10 @@ public class MenuHandler {
      * 1. Solicita ID del envío
      * 2. Obtiene el envío actual de la BD
      * 3. Muestra valores actuales y permite actualizar:
-     *    - Empresa (Enter para mantener actual)
+     *    - Empresa
      *    - Tracking (Enter para mantener actual)
-     *    - Tipo (Enter para mantener actual)
-     *    - Estado (Enter para mantener actual)
+     *    - Tipo
+     *    - Estado
      *    - Costo (Enter para mantener actual)
      *    - Fecha de despacho (Enter para mantener actual)
      * 4. Invoca envioService.actualizar()
@@ -316,15 +316,9 @@ public class MenuHandler {
 
     public void actualizarEnvioPorId(Envio envio) {
 
-        System.out.print("Nueva empresa (actual: " + envio.getEmpresa() + ", Enter para mantener): ");
-        String empresaString = scanner.nextLine().trim();
-        if (!empresaString.isEmpty()) {
-            Envio.Empresa empresa = Envio.Empresa.valueOf(empresaString);
-            envio.setEmpresa(empresa);
-        } else {
-            envio.setEmpresa(envio.getEmpresa());
-        }
-
+        System.out.print("Nueva empresa (actual: " + envio.getEmpresa() + "): ");
+        Envio.Empresa empresa = obtenerEmpresaDesdeScanner();
+        envio.setEmpresa(empresa);
         System.out.print("Nuevo tacking (actual: " + envio.getTracking() + ", Enter para mantener): ");
         String numero = scanner.nextLine().trim();
         if (!numero.isEmpty()) {
@@ -333,23 +327,13 @@ public class MenuHandler {
             envio.setTracking(envio.getTracking());
         }
 
-        System.out.print("Nuevo Tipo (actual: " + envio.getTipo() + ", Enter para mantener): ");
-        String tipo = scanner.nextLine().trim();
-        if (!tipo.isEmpty()) {
-            envio.setTipo(Envio.Tipo.valueOf(tipo));
-        } else {
-            envio.setTipo(envio.getTipo());
-        }
-
-        System.out.print("Nuevo Estado (actual: " + envio.getEstado() + ", Enter para mantener): ");
-        String estado = scanner.nextLine().trim();
-        if (!estado.isEmpty()) {
-            envio.setEstado(Envio.Estado.valueOf(estado));
-        } else {
-            envio.setEstado(envio.getEstado());
-        }
-
-        System.out.print("Nuevo costo (actual: " + envio.getCosto() + ", Enter para mantener): ");
+        System.out.print("Nuevo Tipo (actual: " + envio.getTipo() + "): ");
+        Envio.Tipo tipo = obtenerTipoDesdeScanner();
+        envio.setTipo(tipo);
+        System.out.print("Nuevo Estado (actual: " + envio.getEstado() + "): ");
+        Envio.Estado estado = obtenerEstadoDesdeScanner();
+        envio.setEstado(estado);
+        System.out.print("Nuevo costo (actual: " + envio.getCosto() + "): ");
         String inputCosto = scanner.nextLine().trim();
         if (!inputCosto.isEmpty()) {
             boolean valido = true;
@@ -444,10 +428,42 @@ public class MenuHandler {
      *
      * Nota: Esta opción toma el envío desde el pedido para asegurar que se actualice el correcto.
      */
+    public void actualizarEnvioPorPedido() {
+        try {
+            System.out.print("ID de el pedido cuyo envío desea actualizar: ");
+            Pedido p = obtenerPedidoDesdeScanner();
+            if (p == null) return;
+            Envio envio = pedidosService.getEnvioService().getByIdUpdate(p.getEnvio().getId());
+
+            if (envio == null) {
+                System.out.println("El pedido no tiene envio asociado.");
+                return;
+            }
+
+            if (envio.isEliminado() ) {
+                System.out.println("El envío" + envio + "\nFigura como eliminado quiere reinsertar el mismo envio con los mismos datos? (s/n)");
+                String subopcion = scanner.nextLine().trim();
+                if (subopcion.equalsIgnoreCase("s")) {
+                    envio.setEliminado(false);
+                    pedidosService.getEnvioService().restaurar(p.getId());
+                    System.out.println("Envio reinsertado exitosamente");
+                    ;
+                } else {
+
+                    actualizarEnvioPorId(envio);
+                }
+            } else {
+                actualizarEnvioPorId(envio);
+            }
+
+        } catch (Exception e) {
+            System.err.println("Error al actualizar envio: " + e.getMessage());
+        }
+    }
 
     public void checkEliminado(Envio envio, int pedidoId) {
         try {
-            System.out.println("El nevio" + envio + "\nFigura como eliminado quiere reinsertar el mismo envio con los mismos datos? (s/n)");
+            System.out.println("El envío" + envio + "\nFigura como eliminado quiere reinsertar el mismo envio con los mismos datos? (s/n)");
             String subopcion = scanner.nextLine().trim();
             if (subopcion.equalsIgnoreCase("s")) {
                 envio.setEliminado(false);
@@ -462,36 +478,6 @@ public class MenuHandler {
         }
     }
 
-    public void actualizarEnvioPorPedido() {
-        try {
-            System.out.print("ID de el pedido cuyo envio desea actualizar: ");
-            Pedido p = obtenerPedidoDesdeScanner();
-            if (p == null) return;
-            Envio envio = pedidosService.getEnvioService().getByIdUpdate(p.getEnvio().getId());
-
-            if (envio == null) {
-                System.out.println("El pedido no tiene envio asociado.");
-                return;
-            }
-
-            if (envio.isEliminado() ) {
-                System.out.println("El nevio" + envio + "\nFigura como eliminado quiere reinsertar el mismo envio con los mismos datos? (s/n)");
-                String subopcion = scanner.nextLine().trim();
-                if (subopcion.equalsIgnoreCase("s")) {
-                    envio.setEliminado(false);
-                    pedidosService.getEnvioService().restaurar(p.getId());
-                    System.out.println("Envio reinsertado exitosamente");
-                    ;
-                } else {
-
-                    actualizarEnvioPorId(envio);
-                }
-            }
-
-        } catch (Exception e) {
-            System.err.println("Error al actualizar envio: " + e.getMessage());
-        }
-    }
 
 
     /**

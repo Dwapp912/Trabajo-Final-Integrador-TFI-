@@ -1,5 +1,6 @@
 package Service;
 
+import java.sql.Connection;
 import java.util.List;
 import Dao.GenericDAO;
 import Models.Envio;
@@ -155,5 +156,9 @@ public class EnvioServiceImpl implements GenericService<Envio> {
         if (envio.getTracking() == null || envio.getTracking().trim().isEmpty()) {
             throw new IllegalArgumentException("El número no puede estar vacío");
         }
+    }
+
+    public void insertarConTx(Envio envio, Connection conn) throws Exception {
+        envioDAO.insertTx(envio, conn);
     }
 }

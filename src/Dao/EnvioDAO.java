@@ -174,6 +174,7 @@ public class EnvioDAO implements GenericDAO<Envio> {
     public void insertTx(Envio envio, Connection conn) throws Exception {
         try (PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             setearParametrosEnvio(stmt, envio);
+            stmt.setInt(8, envio.getPedidoId());
             stmt.executeUpdate();
             setGeneratedId(stmt, envio);
         }

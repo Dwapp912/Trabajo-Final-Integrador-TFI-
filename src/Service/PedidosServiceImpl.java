@@ -1,5 +1,6 @@
 package Service;
 
+import Models.Envio;
 import Models.Pedido;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class PedidosServiceImpl implements GenericService<Pedido> {
      * Inyectado en el constructor (Dependency Injection).
      */
     private final PedidoDAO pedidoDAO;
+
 
     /**
      * Servicio de envios para coordinar operaciones transaccionales.
@@ -79,15 +81,59 @@ public class PedidosServiceImpl implements GenericService<Pedido> {
         if (pedido.getEnvio() != null) {
             if (pedido.getEnvio().getId() == 0) {
                 // Envio nuevo: insertar primero para obtener ID autogenerado
-                envioServiceImpl.insertar(pedido.getEnvio());
+                insertarConEnvio(pedido);
             } else {
                 // Envio existente: actualizar datos
                 envioServiceImpl.actualizar(pedido.getEnvio());
             }
+        } else {
+            pedidoDAO.insertar(pedido);
         }
-
-        pedidoDAO.insertar(pedido);
     }
+
+
+    /**
+     * Inserta un pedido y su envío (si existe) en una única transacción.
+     * Usa TransactionManager para asegurar atomicidad: o se insertan ambos o ninguno.
+     */
+    public void insertarConEnvio(Pedido pedido) throws Exception {
+
+        java.sql.Connection conn = null;
+        Config.TransactionManager tx = null;
+        try {
+            conn = Config.DatabaseConnection.getConnection();
+            tx = new Config.TransactionManager(conn);
+            tx.startTransaction();
+
+            // Insertar pedido primero para obtener su ID (FK en envío es pedidoId)
+            pedidoDAO.insertTx(pedido, conn);
+
+            // Ya sabemos que hay envío, asociarlo al pedido insertado e insertarlo
+            if (pedido.getEnvio().getEmpresa() == Envio.Empresa.OCA) {
+                throw new Exception("No se pueden realziar envios para OCA");
+            }
+            envioServiceImpl.insertarConTx(pedido.getEnvio(), conn);
+
+
+
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            throw e;
+        } finally {
+            if (tx != null) {
+                tx.close();
+            } else if (conn != null) {
+                try { conn.close(); } catch (java.sql.SQLException ignore) {}
+            }
+        }
+    }
+
+
+
+
 
     /**
      * Actualiza un pedido existente en la base de datos.

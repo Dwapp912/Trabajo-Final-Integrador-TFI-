@@ -93,12 +93,15 @@ public class MenuHandler {
             Pedido.Estado estadoPedido = Pedido.Estado.NUEVO;
 
             Pedido pedido = new Pedido(0, false, numeroPedido, fecha, nombreCliente,  totalPedido, estadoPedido, null);
-            pedidosService.insertar(pedido);
-            System.out.print("¿Desea agregar un envio? (s/n): ");
-            if (scanner.nextLine().equalsIgnoreCase("s")) {
-                Envio envio = crearEnvio(pedido);
+
+            System.out.print("¿Desea agregar un envio ahora (transaccional)? (s/n): ");
+            String respuestaEnvio = scanner.nextLine();
+            if (respuestaEnvio.equalsIgnoreCase("s")) {
+                Envio envio = obtenerPedidoDesdeScanner(pedido);
                 pedido.setEnvio(envio);
             }
+            // si tiene pedido el service se encarga de llamar al DAO usando TX
+            pedidosService.insertar(pedido);
 
             System.out.println("Pedido creado exitosamente con ID: " + pedido.getId());
         } catch (Exception e) {
@@ -529,7 +532,14 @@ public class MenuHandler {
 
 
 
-    public Envio crearEnvio(Pedido pedido) {
+    public Envio crearEnvio(Pedido pedido) throws Exception {
+        Envio envio = obtenerPedidoDesdeScanner(pedido);
+        enviosService.insertar(envio);
+        return envio;
+    }
+
+    // Construye un Envío asociado al Pedido sin persistirlo (para flujo transaccional)
+    private Envio obtenerPedidoDesdeScanner(Pedido pedido) {
         try {
             System.out.print("Tracking: ");
             String tracking = scanner.nextLine().trim();
@@ -543,14 +553,11 @@ public class MenuHandler {
             LocalDate fechaDespacho = obtenerFechaPosteriorA(pedido.getFecha(), "despacho", "pedido");
             LocalDate fechaEstimada = obtenerFechaPosteriorA(fechaDespacho, "llegada", "despacho");
 
-            Envio envio = new Envio(0, false, tracking, empresa, tipo, costo, fechaDespacho, fechaEstimada, estado, pedido);
-            enviosService.insertar(envio);
-
+            return new Envio(0, false, tracking, empresa, tipo, costo, fechaDespacho, fechaEstimada, estado, pedido);
         } catch (Exception e) {
             System.err.println("Error al crear envío: " + e.getMessage());
-
+            return null;
         }
-        return null;
     }
 
     private LocalDate obtenerFechaPosteriorA(LocalDate fechaAnterior, String nombreFechaAObtener, String nombreFechaAnterior) {

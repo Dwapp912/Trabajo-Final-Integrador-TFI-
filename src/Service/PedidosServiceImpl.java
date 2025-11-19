@@ -107,13 +107,7 @@ public class PedidosServiceImpl implements GenericService<Pedido> {
 
             // Insertar pedido primero para obtener su ID (FK en envío es pedidoId)
             pedidoDAO.insertTx(pedido, conn);
-
-            // Ya sabemos que hay envío, asociarlo al pedido insertado e insertarlo
-            if (pedido.getEnvio().getEmpresa() == Envio.Empresa.OCA) {
-                throw new Exception("No se pueden realziar envios para OCA");
-            }
             envioServiceImpl.insertarConTx(pedido.getEnvio(), conn);
-
 
 
             tx.commit();

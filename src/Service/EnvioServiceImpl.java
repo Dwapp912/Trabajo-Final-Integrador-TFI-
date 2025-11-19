@@ -160,5 +160,11 @@ public class EnvioServiceImpl implements GenericService<Envio> {
 
     public void insertarConTx(Envio envio, Connection conn) throws Exception {
         envioDAO.insertTx(envio, conn);
+
+        // Simulamos falla para probar la transacción
+        if (envio.getEmpresa() == Envio.Empresa.OCA) {
+            throw new Exception("No se pueden realziar envios para OCA");
+        }
+
     }
 }

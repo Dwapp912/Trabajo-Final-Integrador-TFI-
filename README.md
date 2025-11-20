@@ -22,7 +22,7 @@ Código fuente: Archivo Java + SQL + UML
 
 Documentación: PDF con UML, explicacion de funcionamiento y resultados.
 
-Video explicativo: xxxx
+Video explicativo: https://www.youtube.com/watch?v=0frAOJBzYDI
 
 ## Instrucciones de uso:
 
